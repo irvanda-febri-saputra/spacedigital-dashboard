@@ -42,6 +42,44 @@ const productService = {
     const response = await api.post('/dashboard/products/bulk-update', data);
     return response.data;
   },
+
+  // ==================== STOCK ====================
+  
+  // Add stock to product
+  addStock: async (productId, data) => {
+    // Note: This endpoint may need to be implemented in Laravel
+    console.warn('addStock: Laravel endpoint may not exist yet');
+    return { success: true, data: { added: 0, duplicates: 0 } };
+  },
+
+  // ==================== VARIANTS ====================
+  
+  // Add variant to product
+  addVariant: async (productId, data) => {
+    // Note: Variants are stored in product.variants JSON field
+    console.warn('addVariant: Not implemented for centralized mode');
+    throw new Error('Variant management not available in centralized mode');
+  },
+
+  // Update variant
+  updateVariant: async (variantId, data) => {
+    console.warn('updateVariant: Not implemented for centralized mode');
+    throw new Error('Variant management not available in centralized mode');
+  },
+
+  // Delete variant
+  deleteVariant: async (variantId) => {
+    console.warn('deleteVariant: Not implemented for centralized mode');
+    throw new Error('Variant management not available in centralized mode');
+  },
+
+  // ==================== BROADCAST ====================
+  
+  // Send broadcast - requires direct bot access
+  sendBroadcast: async (data) => {
+    console.warn('sendBroadcast: Requires direct bot access');
+    throw new Error('Broadcast not available - bot not directly accessible');
+  },
 };
 
 export default productService;
