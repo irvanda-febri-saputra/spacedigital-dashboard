@@ -140,8 +140,19 @@ export default function BotProducts() {
         botProductService.getProducts(),
         new Promise(resolve => setTimeout(resolve, 500))
       ])
-      if (response.success) {
+      // Laravel returns paginated response: { data: [...], current_page, total, etc }
+      // Or it could return { success, data } from old bot API
+      if (response.success !== undefined) {
+        // Old format: { success: true, data: [...] }
         setProducts(response.data || [])
+      } else if (response.data) {
+        // Laravel paginated format: { data: [...], current_page, ... }
+        setProducts(response.data || [])
+      } else if (Array.isArray(response)) {
+        // Direct array response
+        setProducts(response)
+      } else {
+        setProducts([])
       }
     } catch (err) {
       console.error('Error fetching products:', err)
