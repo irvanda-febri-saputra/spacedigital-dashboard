@@ -1,102 +1,114 @@
+import api from './api';
 import axios from 'axios';
 
-// Bot API URL - connect directly to bot server
-const BOT_API_URL = import.meta.env.VITE_BOT_API_URL || 'http://localhost:3000';
+// Bot API URL - for features that need direct bot access (broadcast, stats)
+const BOT_API_URL = import.meta.env.VITE_BOT_API_URL || null;
 
-const botApi = axios.create({
+const botApi = BOT_API_URL ? axios.create({
   baseURL: BOT_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-});
+}) : null;
 
-const productService = {
-  // ==================== PRODUCTS ====================
+const botProductService = {
+  // ==================== PRODUCTS (via Laravel API) ====================
   
-  // Get all products with stock count
+  // Get all products (synced from bot)
   getProducts: async () => {
-    const response = await botApi.get('/api/products');
+    const response = await api.get('/dashboard/products');
     return response.data;
   },
 
-  // Get single product with variants and stock
+  // Get single product
   getProduct: async (id) => {
-    const response = await botApi.get(`/api/products/${id}`);
+    const response = await api.get(`/dashboard/products/${id}`);
     return response.data;
   },
 
   // Create product
   createProduct: async (data) => {
-    const response = await botApi.post('/api/products', data);
+    const response = await api.post('/dashboard/products', data);
     return response.data;
   },
 
   // Update product
   updateProduct: async (id, data) => {
-    const response = await botApi.put(`/api/products/${id}`, data);
+    const response = await api.put(`/dashboard/products/${id}`, data);
     return response.data;
   },
 
   // Delete product
   deleteProduct: async (id) => {
-    const response = await botApi.delete(`/api/products/${id}`);
+    const response = await api.delete(`/dashboard/products/${id}`);
     return response.data;
   },
 
-  // ==================== VARIANTS ====================
+  // Get categories
+  getCategories: async () => {
+    const response = await api.get('/dashboard/products/categories');
+    return response.data;
+  },
+
+  // ==================== VARIANTS (via Laravel API) ====================
   
   // Add variant to product
   addVariant: async (productId, data) => {
-    const response = await botApi.post(`/api/products/${productId}/variants`, data);
+    // Store variant in Laravel - for now just update product variants field
+    const product = await botProductService.getProduct(productId);
+    const variants = product.data?.variants || [];
+    variants.push(data);
+    const response = await api.put(`/dashboard/products/${productId}`, { variants });
     return response.data;
   },
 
   // Update variant
-  updateVariant: async (variantId, data) => {
-    const response = await botApi.put(`/api/variants/${variantId}`, data);
+  updateVariant: async (productId, variantId, data) => {
+    const product = await botProductService.getProduct(productId);
+    const variants = product.data?.variants || [];
+    const index = variants.findIndex(v => v.id === variantId);
+    if (index >= 0) {
+      variants[index] = { ...variants[index], ...data };
+    }
+    const response = await api.put(`/dashboard/products/${productId}`, { variants });
     return response.data;
   },
 
   // Delete variant
-  deleteVariant: async (variantId) => {
-    const response = await botApi.delete(`/api/variants/${variantId}`);
+  deleteVariant: async (productId, variantId) => {
+    const product = await botProductService.getProduct(productId);
+    const variants = (product.data?.variants || []).filter(v => v.id !== variantId);
+    const response = await api.put(`/dashboard/products/${productId}`, { variants });
     return response.data;
   },
 
-  // ==================== STOCK ====================
+  // ==================== STOCK (Read-only - synced from bot) ====================
   
-  // Add stock (single or bulk)
-  addStock: async (productId, data) => {
-    // data: { variant_id?: number, stock_data: string | string[] }
-    const response = await botApi.post(`/api/products/${productId}/stock`, data);
-    return response.data;
+  // Get stock count for product
+  getStock: async (productId) => {
+    const product = await botProductService.getProduct(productId);
+    return { 
+      success: true, 
+      stock_count: product.data?.stock_count || 0,
+      message: 'Stock is synced from bot. Use bot commands to add stock.'
+    };
   },
 
-  // Get stock items
-  getStock: async (productId, params = {}) => {
-    const response = await botApi.get(`/api/products/${productId}/stock`, { params });
-    return response.data;
+  // Add stock - requires bot direct access
+  addStock: async () => {
+    console.warn('Stock management requires direct bot access. Use bot commands.');
+    throw new Error('Stock management tidak tersedia via dashboard. Gunakan command bot /addstock');
   },
 
-  // Delete single stock item
-  deleteStockItem: async (stockId) => {
-    const response = await botApi.delete(`/api/stock/${stockId}`);
-    return response.data;
-  },
-
-  // Clear all stock for product/variant
-  clearStock: async (productId, variantId = null) => {
-    const response = await botApi.delete(`/api/products/${productId}/stock/clear`, {
-      params: variantId ? { variant_id: variantId } : {}
-    });
-    return response.data;
-  },
-
-  // ==================== BROADCAST ====================
+  // ==================== BROADCAST (requires direct bot access) ====================
   
-  // Send broadcast message (with optional image)
+  // Send broadcast message
   sendBroadcast: async ({ message, parse_mode = 'HTML', target = 'all', image = null }) => {
-    // If there's an image, use FormData
+    if (!botApi) {
+      console.warn('Broadcast requires direct bot access. BOT_API_URL not configured.');
+      throw new Error('Broadcast tidak tersedia. Bot API URL tidak dikonfigurasi.');
+    }
+
     if (image) {
       const formData = new FormData();
       formData.append('image', image);
@@ -105,35 +117,34 @@ const productService = {
       formData.append('target', target);
 
       const response = await axios.post(`${BOT_API_URL}/api/broadcast`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
       return response.data;
     }
 
-    // Text only broadcast
-    const response = await botApi.post('/api/broadcast', {
-      message,
-      parse_mode,
-      target
-    });
+    const response = await botApi.post('/api/broadcast', { message, parse_mode, target });
     return response.data;
   },
 
-  // ==================== STATS ====================
+  // ==================== STATS (requires direct bot access) ====================
   
-  // Get bot statistics
   getStats: async () => {
+    if (!botApi) {
+      console.warn('Stats requires direct bot access.');
+      return { success: false, message: 'Bot stats tidak tersedia via dashboard.' };
+    }
     const response = await botApi.get('/api/stats');
     return response.data;
   },
 
-  // Get bot users
   getUsers: async (limit = 100) => {
+    if (!botApi) {
+      console.warn('Users requires direct bot access.');
+      return { success: false, users: [] };
+    }
     const response = await botApi.get('/api/users', { params: { limit } });
     return response.data;
   },
 };
 
-export default productService;
+export default botProductService;
