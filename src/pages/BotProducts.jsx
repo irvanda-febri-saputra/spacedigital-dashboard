@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import productService from '../services/productService'
+import botProductService from '../services/botProductService'
 import NeoToast from '../components/NeoToast'
 import { TableRowSkeleton } from '../components/Skeleton'
 
@@ -137,7 +137,7 @@ export default function BotProducts() {
       setLoading(true)
       // Minimum loading time untuk animasi terlihat
       const [response] = await Promise.all([
-        productService.getProducts(),
+        botProductService.getProducts(),
         new Promise(resolve => setTimeout(resolve, 500))
       ])
       if (response.success) {
@@ -198,10 +198,10 @@ export default function BotProducts() {
 
     try {
       if (editingProduct) {
-        await productService.updateProduct(editingProduct.id, productForm)
+        await botProductService.updateProduct(editingProduct.id, productForm)
         setToast({ message: 'Produk berhasil diupdate!', type: 'success' })
       } else {
-        await productService.createProduct(productForm)
+        await botProductService.createProduct(productForm)
         setToast({ message: 'Produk berhasil ditambahkan!', type: 'success' })
       }
       setShowModal(false)
@@ -215,7 +215,7 @@ export default function BotProducts() {
 
   const handleDeleteProduct = async (product) => {
     try {
-      await productService.deleteProduct(product.id)
+      await botProductService.deleteProduct(product.id)
       setToast({ message: 'Produk berhasil dihapus!', type: 'success' })
       setDeleteConfirm(null)
       fetchProducts()
@@ -249,7 +249,7 @@ export default function BotProducts() {
         ? stockForm.single_data 
         : stockForm.stock_data
 
-      const response = await productService.addStock(selectedProduct.id, {
+      const response = await botProductService.addStock(selectedProduct.id, {
         variant_id: stockForm.variant_id || null,
         stock_data: dataToSend
       })
@@ -293,10 +293,10 @@ export default function BotProducts() {
 
     try {
       if (editingVariant) {
-        await productService.updateVariant(editingVariant.id, variantForm)
+        await botProductService.updateVariant(editingVariant.id, variantForm)
         setToast({ message: 'Varian berhasil diupdate!', type: 'success' })
       } else {
-        await productService.addVariant(selectedProduct.id, variantForm)
+        await botProductService.addVariant(selectedProduct.id, variantForm)
         setToast({ message: 'Varian berhasil ditambahkan!', type: 'success' })
       }
       setShowModal(false)
@@ -310,7 +310,7 @@ export default function BotProducts() {
 
   const handleDeleteVariant = async (variantId) => {
     try {
-      await productService.deleteVariant(variantId)
+      await botProductService.deleteVariant(variantId)
       setToast({ message: 'Varian berhasil dihapus!', type: 'success' })
       fetchProducts()
     } catch (err) {
@@ -374,7 +374,7 @@ export default function BotProducts() {
     setSaving(true)
 
     try {
-      const response = await productService.sendBroadcast({
+      const response = await botProductService.sendBroadcast({
         message: broadcastForm.message,
         parse_mode: broadcastForm.parse_mode,
         target: broadcastForm.target,
