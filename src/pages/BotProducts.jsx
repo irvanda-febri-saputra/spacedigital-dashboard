@@ -518,9 +518,9 @@ export default function BotProducts() {
                       </span>
                     </td>
                     <td className="align-top">
-                      {product.variants?.length > 0 ? (
+                      {Array.isArray(product.variants) && product.variants.length > 0 ? (
                         <div className="space-y-1">
-                          {(product.variants || []).slice(0, 3).map(v => (
+                          {(Array.isArray(product.variants) ? product.variants : []).slice(0, 3).map(v => (
                             <div key={v.id} className="flex items-center gap-2 text-xs">
                               <span className="font-medium text-gray-700 whitespace-nowrap">{v.name}</span>
                               <span className="font-mono text-primary-500 whitespace-nowrap">{formatPrice(v.price)}</span>
