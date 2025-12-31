@@ -64,8 +64,21 @@ const botProductService = {
       const productData = product.data || product; // Handle both response structures
       console.log('[addVariant] Product data:', productData);
       
-      const variants = productData.variants || [];
-      console.log('[addVariant] Current variants:', variants);
+      // Parse variants - Laravel returns JSON string "[]" instead of array
+      let variants = [];
+      if (productData.variants) {
+        if (typeof productData.variants === 'string') {
+          try {
+            variants = JSON.parse(productData.variants);
+          } catch (e) {
+            console.warn('[addVariant] Failed to parse variants JSON:', e);
+            variants = [];
+          }
+        } else if (Array.isArray(productData.variants)) {
+          variants = productData.variants;
+        }
+      }
+      console.log('[addVariant] Parsed variants:', variants);
       
       variants.push(data);
       console.log('[addVariant] Variants after push:', variants);
@@ -96,7 +109,22 @@ const botProductService = {
   updateVariant: async (productId, variantId, data) => {
     const product = await botProductService.getProduct(productId);
     const productData = product.data || product; // Handle both response structures
-    const variants = productData.variants || [];
+    
+    // Parse variants - Laravel returns JSON string instead of array
+    let variants = [];
+    if (productData.variants) {
+      if (typeof productData.variants === 'string') {
+        try {
+          variants = JSON.parse(productData.variants);
+        } catch (e) {
+          console.warn('[updateVariant] Failed to parse variants JSON:', e);
+          variants = [];
+        }
+      } else if (Array.isArray(productData.variants)) {
+        variants = productData.variants;
+      }
+    }
+    
     const index = variants.findIndex(v => v.id === variantId);
     if (index >= 0) {
       variants[index] = { ...variants[index], ...data };
@@ -118,7 +146,23 @@ const botProductService = {
   deleteVariant: async (productId, variantId) => {
     const product = await botProductService.getProduct(productId);
     const productData = product.data || product; // Handle both response structures
-    const variants = (productData.variants || []).filter(v => v.id !== variantId);
+    
+    // Parse variants - Laravel returns JSON string instead of array
+    let variants = [];
+    if (productData.variants) {
+      if (typeof productData.variants === 'string') {
+        try {
+          variants = JSON.parse(productData.variants);
+        } catch (e) {
+          console.warn('[deleteVariant] Failed to parse variants JSON:', e);
+          variants = [];
+        }
+      } else if (Array.isArray(productData.variants)) {
+        variants = productData.variants;
+      }
+    }
+    
+    variants = variants.filter(v => v.id !== variantId);
     
     // Send full product data to preserve all fields
     const response = await api.put(`/dashboard/products/${productId}`, {
