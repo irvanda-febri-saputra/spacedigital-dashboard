@@ -176,6 +176,12 @@ const botProductService = {
     return response.data;
   },
 
+  // Delete product
+  deleteProduct: async (productId) => {
+    const response = await api.delete(`/dashboard/products/${productId}`);
+    return response.data;
+  },
+
   // ==================== STOCK (Read-only - synced from bot) ====================
   
   // Get stock count for product
