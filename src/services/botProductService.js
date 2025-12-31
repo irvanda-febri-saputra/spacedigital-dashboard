@@ -56,16 +56,17 @@ const botProductService = {
   addVariant: async (productId, data) => {
     // Store variant in Laravel - for now just update product variants field
     const product = await botProductService.getProduct(productId);
-    const variants = product.data?.variants || [];
+    const productData = product.data || product; // Handle both response structures
+    const variants = productData.variants || [];
     variants.push(data);
     
     // Send full product data to preserve all fields
     const response = await api.put(`/dashboard/products/${productId}`, {
-      name: product.data.name,
-      description: product.data.description,
-      price: product.data.price,
-      category: product.data.category,
-      is_active: product.data.is_active,
+      name: productData.name,
+      description: productData.description,
+      price: productData.price,
+      category: productData.category,
+      is_active: productData.is_active,
       variants: variants
     });
     return response.data;
@@ -74,7 +75,8 @@ const botProductService = {
   // Update variant
   updateVariant: async (productId, variantId, data) => {
     const product = await botProductService.getProduct(productId);
-    const variants = product.data?.variants || [];
+    const productData = product.data || product; // Handle both response structures
+    const variants = productData.variants || [];
     const index = variants.findIndex(v => v.id === variantId);
     if (index >= 0) {
       variants[index] = { ...variants[index], ...data };
@@ -82,11 +84,11 @@ const botProductService = {
     
     // Send full product data to preserve all fields
     const response = await api.put(`/dashboard/products/${productId}`, {
-      name: product.data.name,
-      description: product.data.description,
-      price: product.data.price,
-      category: product.data.category,
-      is_active: product.data.is_active,
+      name: productData.name,
+      description: productData.description,
+      price: productData.price,
+      category: productData.category,
+      is_active: productData.is_active,
       variants: variants
     });
     return response.data;
@@ -95,15 +97,16 @@ const botProductService = {
   // Delete variant
   deleteVariant: async (productId, variantId) => {
     const product = await botProductService.getProduct(productId);
-    const variants = (product.data?.variants || []).filter(v => v.id !== variantId);
+    const productData = product.data || product; // Handle both response structures
+    const variants = (productData.variants || []).filter(v => v.id !== variantId);
     
     // Send full product data to preserve all fields
     const response = await api.put(`/dashboard/products/${productId}`, {
-      name: product.data.name,
-      description: product.data.description,
-      price: product.data.price,
-      category: product.data.category,
-      is_active: product.data.is_active,
+      name: productData.name,
+      description: productData.description,
+      price: productData.price,
+      category: productData.category,
+      is_active: productData.is_active,
       variants: variants
     });
     return response.data;
