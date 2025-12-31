@@ -312,7 +312,7 @@ export default function BotProducts() {
 
     try {
       if (editingVariant) {
-        await botProductService.updateVariant(editingVariant.id, variantForm)
+        await botProductService.updateVariant(selectedProduct.id, editingVariant.id, variantForm)
         setToast({ message: 'Varian berhasil diupdate!', type: 'success' })
       } else {
         await botProductService.addVariant(selectedProduct.id, variantForm)
