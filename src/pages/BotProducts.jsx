@@ -349,7 +349,7 @@ export default function BotProducts() {
 
   const handleDeleteVariant = async (variantId) => {
     try {
-      await botProductService.deleteVariant(variantId)
+      await botProductService.deleteVariant(selectedProduct.id, variantId)
       setToast({ message: 'Varian berhasil dihapus!', type: 'success' })
       fetchProducts()
     } catch (err) {
