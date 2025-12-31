@@ -54,22 +54,42 @@ const botProductService = {
   
   // Add variant to product
   addVariant: async (productId, data) => {
-    // Store variant in Laravel - for now just update product variants field
-    const product = await botProductService.getProduct(productId);
-    const productData = product.data || product; // Handle both response structures
-    const variants = productData.variants || [];
-    variants.push(data);
-    
-    // Send full product data to preserve all fields
-    const response = await api.put(`/dashboard/products/${productId}`, {
-      name: productData.name,
-      description: productData.description,
-      price: productData.price,
-      category: productData.category,
-      is_active: productData.is_active,
-      variants: variants
-    });
-    return response.data;
+    try {
+      console.log('[addVariant] Starting - productId:', productId, 'data:', data);
+      
+      // Store variant in Laravel - for now just update product variants field
+      const product = await botProductService.getProduct(productId);
+      console.log('[addVariant] Product fetched:', product);
+      
+      const productData = product.data || product; // Handle both response structures
+      console.log('[addVariant] Product data:', productData);
+      
+      const variants = productData.variants || [];
+      console.log('[addVariant] Current variants:', variants);
+      
+      variants.push(data);
+      console.log('[addVariant] Variants after push:', variants);
+      
+      // Send full product data to preserve all fields
+      const payload = {
+        name: productData.name,
+        description: productData.description,
+        price: productData.price,
+        category: productData.category,
+        is_active: productData.is_active,
+        variants: variants
+      };
+      console.log('[addVariant] Sending payload:', payload);
+      
+      const response = await api.put(`/dashboard/products/${productId}`, payload);
+      console.log('[addVariant] Response:', response);
+      
+      return response.data;
+    } catch (error) {
+      console.error('[addVariant] ERROR:', error);
+      console.error('[addVariant] Error details:', error.response?.data);
+      throw error;
+    }
   },
 
   // Update variant
