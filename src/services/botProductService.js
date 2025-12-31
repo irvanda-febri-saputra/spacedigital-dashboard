@@ -58,7 +58,16 @@ const botProductService = {
     const product = await botProductService.getProduct(productId);
     const variants = product.data?.variants || [];
     variants.push(data);
-    const response = await api.put(`/dashboard/products/${productId}`, { variants });
+    
+    // Send full product data to preserve all fields
+    const response = await api.put(`/dashboard/products/${productId}`, {
+      name: product.data.name,
+      description: product.data.description,
+      price: product.data.price,
+      category: product.data.category,
+      is_active: product.data.is_active,
+      variants: variants
+    });
     return response.data;
   },
 
@@ -70,7 +79,16 @@ const botProductService = {
     if (index >= 0) {
       variants[index] = { ...variants[index], ...data };
     }
-    const response = await api.put(`/dashboard/products/${productId}`, { variants });
+    
+    // Send full product data to preserve all fields
+    const response = await api.put(`/dashboard/products/${productId}`, {
+      name: product.data.name,
+      description: product.data.description,
+      price: product.data.price,
+      category: product.data.category,
+      is_active: product.data.is_active,
+      variants: variants
+    });
     return response.data;
   },
 
@@ -78,7 +96,16 @@ const botProductService = {
   deleteVariant: async (productId, variantId) => {
     const product = await botProductService.getProduct(productId);
     const variants = (product.data?.variants || []).filter(v => v.id !== variantId);
-    const response = await api.put(`/dashboard/products/${productId}`, { variants });
+    
+    // Send full product data to preserve all fields
+    const response = await api.put(`/dashboard/products/${productId}`, {
+      name: product.data.name,
+      description: product.data.description,
+      price: product.data.price,
+      category: product.data.category,
+      is_active: product.data.is_active,
+      variants: variants
+    });
     return response.data;
   },
 
