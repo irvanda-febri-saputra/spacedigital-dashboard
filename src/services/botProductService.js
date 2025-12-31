@@ -94,10 +94,13 @@ const botProductService = {
     };
   },
 
-  // Add stock - requires bot direct access
-  addStock: async () => {
-    console.warn('Stock management requires direct bot access. Use bot commands.');
-    throw new Error('Stock management tidak tersedia via dashboard. Gunakan command bot /addstock');
+  // Add stock via Laravel API (will notify bot via webhook)
+  addStock: async (productId, variantId, stockData) => {
+    const response = await api.post(`/dashboard/products/${productId}/stock`, {
+      variant_id: variantId,
+      stock_data: stockData
+    });
+    return response.data;
   },
 
   // ==================== BROADCAST (requires direct bot access) ====================
