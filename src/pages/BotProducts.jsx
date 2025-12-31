@@ -272,7 +272,14 @@ export default function BotProducts() {
           type: 'success' 
         })
         setShowModal(false)
+        
+        // Immediate refresh
         fetchProducts()
+        
+        // Delayed refresh after 2s to get updated count from bot sync
+        setTimeout(() => {
+          fetchProducts()
+        }, 2000)
       }
     } catch (err) {
       setToast({ message: err.response?.data?.error || 'Gagal menambah stock', type: 'error' })
