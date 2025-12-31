@@ -260,14 +260,15 @@ export default function BotProducts() {
         ? stockForm.single_data 
         : stockForm.stock_data
 
-      const response = await botProductService.addStock(selectedProduct.id, {
-        variant_id: stockForm.variant_id || null,
-        stock_data: dataToSend
-      })
+      const response = await botProductService.addStock(
+        selectedProduct.id,
+        stockForm.variant_id || null,
+        dataToSend
+      )
       
       if (response.success) {
         setToast({ 
-          message: `${response.data.added} stock ditambahkan!${response.data.duplicates > 0 ? ` (${response.data.duplicates} duplikat)` : ''}`, 
+          message: 'Stock berhasil ditambahkan!', 
           type: 'success' 
         })
         setShowModal(false)
