@@ -311,11 +311,31 @@ export default function BotProducts() {
     setSaving(true)
 
     try {
+      // Validate and prepare variant data
+      const variantData = {
+        name: variantForm.name?.trim(),
+        variant_code: variantForm.variant_code?.trim() || variantForm.name?.trim().replace(/\s+/g, '_').toUpperCase(),
+        price: parseInt(variantForm.price) || 0
+      }
+      
+      // Validation
+      if (!variantData.name) {
+        setToast({ message: 'Nama variant harus diisi!', type: 'error' })
+        setSaving(false)
+        return
+      }
+      
+      if (variantData.price <= 0) {
+        setToast({ message: 'Harga variant harus lebih dari 0!', type: 'error' })
+        setSaving(false)
+        return
+      }
+      
       if (editingVariant) {
-        await botProductService.updateVariant(selectedProduct.id, editingVariant.id, variantForm)
+        await botProductService.updateVariant(selectedProduct.id, editingVariant.id, variantData)
         setToast({ message: 'Varian berhasil diupdate!', type: 'success' })
       } else {
-        await botProductService.addVariant(selectedProduct.id, variantForm)
+        await botProductService.addVariant(selectedProduct.id, variantData)
         setToast({ message: 'Varian berhasil ditambahkan!', type: 'success' })
       }
       setShowModal(false)
