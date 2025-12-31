@@ -189,7 +189,7 @@ export default function BotProducts() {
       price: product.price || '',
       category: product.category || 'Digital Product',
       terms: product.terms || '',
-      is_active: product.is_active ?? 1
+      is_active: product.is_active ? 1 : 0
     } : {
       name: '',
       product_code: '',
