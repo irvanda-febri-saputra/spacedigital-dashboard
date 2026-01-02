@@ -417,6 +417,7 @@ export default function BotProducts() {
       let imageUrl = null
       if (broadcastForm.image) {
         try {
+          console.log('📤 Uploading image to Catbox.moe...')
           const formData = new FormData()
           formData.append('reqtype', 'fileupload')
           formData.append('fileToUpload', broadcastForm.image)
@@ -426,15 +427,21 @@ export default function BotProducts() {
             body: formData
           })
           
-          if (uploadResponse.ok) {
-            imageUrl = await uploadResponse.text()
-            console.log('✅ Image uploaded to Catbox:', imageUrl)
+          const responseText = await uploadResponse.text()
+          console.log('Catbox response:', uploadResponse.status, responseText)
+          
+          if (uploadResponse.ok && responseText.startsWith('http')) {
+            imageUrl = responseText.trim()
+            console.log('✅ Image uploaded:', imageUrl)
           } else {
-            throw new Error('Upload failed')
+            throw new Error(`Upload failed: ${responseText}`)
           }
         } catch (uploadErr) {
-          console.error('Catbox upload error:', uploadErr)
-          setToast({ message: 'Gagal upload gambar, broadcast hanya text', type: 'warning' })
+          console.error('❌ Catbox upload error:', uploadErr)
+          setToast({ 
+            message: `Gagal upload gambar: ${uploadErr.message}. Broadcast tetap dikirim (text only)`, 
+            type: 'warning' 
+          })
           // Continue without image
         }
       }
