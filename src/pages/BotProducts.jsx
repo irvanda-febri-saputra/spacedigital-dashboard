@@ -413,49 +413,15 @@ export default function BotProducts() {
     setSaving(true)
 
     try {
-      // Upload image first if exists
-      let imageUrl = null
-      if (broadcastForm.image) {
-        try {
-          console.log('📤 Uploading image via backend...')
-          
-          // Upload to Laravel backend which proxies to Catbox
-          const formData = new FormData()
-          formData.append('image', broadcastForm.image)
-          
-          const uploadResponse = await fetch('/api/dashboard/upload-image', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: formData
-          })
-          
-          let uploadData
-          try {
-            uploadData = await uploadResponse.json()
-          } catch (e) {
-            const responseText = await uploadResponse.text()
-            console.error('Non-JSON response:', uploadResponse.status, responseText)
-            throw new Error(`Server error (${uploadResponse.status}). Make sure VPS has latest code.`)
-          }
-          
-          console.log('Upload response:', uploadData)
-          
-          if (uploadData.success && uploadData.url) {
-            imageUrl = uploadData.url
-            console.log('✅ Image uploaded:', imageUrl)
-          } else {
-            throw new Error(uploadData.error || 'Upload failed')
-          }
-        } catch (uploadErr) {
-          console.error('❌ Image upload error:', uploadErr)
-          setToast({ 
-            message: `Gagal upload gambar: ${uploadErr.message}. Broadcast tetap dikirim (text only)`, 
-            type: 'warning' 
-          })
-          // Continue without image
-        }
+      // Use image URL directly from form (no upload needed)
+      let imageUrl = broadcastForm.imageUrl || null
+      
+      if (imageUrl && !imageUrl.startsWith('http')) {
+        setToast({ 
+          message: 'URL gambar harus dimulai dengan http:// atau https://', 
+          type: 'warning' 
+        })
+        imageUrl = null
       }
 
       // Get first bot (or selected bot)
