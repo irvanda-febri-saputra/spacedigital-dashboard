@@ -248,6 +248,18 @@ const botProductService = {
     const response = await botApi.get('/api/users', { params: { limit } });
     return response.data;
   },
+
+  // ==================== BROADCAST ====================
+  
+  sendBroadcast: async (botId, data) => {
+    const response = await api.post('/dashboard/broadcast', {
+      bot_id: botId,
+      message: data.message,
+      image_url: data.imageUrl,
+      format: data.format
+    });
+    return response.data;
+  },
 };
 
 export default botProductService;
