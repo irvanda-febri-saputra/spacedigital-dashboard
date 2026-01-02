@@ -413,21 +413,39 @@ export default function BotProducts() {
     setSaving(true)
 
     try {
-      const response = await botProductService.sendBroadcast({
+      // Upload image first if exists
+      let imageUrl = null
+      if (broadcastForm.image) {
+        // TODO: Implement image upload to storage
+        // For now, use imagePreview (base64) or skip
+        setToast({ message: 'Image upload belum diimplementasi. Gunakan URL gambar langsung.', type: 'warning' })
+      }
+
+      // Get first bot (or selected bot)
+      const botId = products[0]?.bot_id || 1 // Assuming first product's bot_id
+      
+      const response = await botProductService.sendBroadcast(botId, {
         message: broadcastForm.message,
-        parse_mode: broadcastForm.parse_mode,
-        target: broadcastForm.target,
-        image: broadcastForm.image
+        imageUrl: imageUrl,
+        format: broadcastForm.parse_mode
       })
       
       if (response.success) {
         setToast({ 
-          message: `Broadcast terkirim ke ${response.data.sent} user!`, 
+          message: `Broadcast berhasil dikirim!`, 
           type: 'success' 
         })
         setShowModal(false)
+        setBroadcastForm({
+          message: '',
+          parse_mode: 'HTML',
+          target: 'all',
+          image: null,
+          imagePreview: null
+        })
       }
     } catch (err) {
+      console.error('Broadcast error:', err)
       setToast({ message: err.response?.data?.error || 'Gagal mengirim broadcast', type: 'error' })
     } finally {
       setSaving(false)
