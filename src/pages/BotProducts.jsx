@@ -119,13 +119,12 @@ export default function BotProducts() {
   // Edit variant state
   const [editingVariant, setEditingVariant] = useState(null)
 
-  // Broadcast form - now with image support
+  // Broadcast form - with image URL support
   const [broadcastForm, setBroadcastForm] = useState({
     message: '',
     parse_mode: 'HTML',
     target: 'all',
-    image: null,
-    imagePreview: null
+    imageUrl: ''
   })
 
   useEffect(() => {
@@ -983,47 +982,24 @@ export default function BotProducts() {
                 </select>
               </div>
 
-              {/* Image Upload */}
+              {/* Image URL Input */}
               <div>
-                <label className="block font-bold mb-2">Gambar Banner (Opsional)</label>
+                <label className="block font-bold mb-2">URL Gambar (Opsional)</label>
                 <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageSelect}
-                  className="hidden"
+                  type="url"
+                  value={broadcastForm.imageUrl}
+                  onChange={(e) => setBroadcastForm({ ...broadcastForm, imageUrl: e.target.value })}
+                  className="neo-input"
+                  placeholder="https://files.catbox.moe/abc123.jpg"
                 />
-                {broadcastForm.imagePreview ? (
-                  <div className="relative">
-                    <img 
-                      src={broadcastForm.imagePreview} 
-                      alt="Preview" 
-                      className="w-full h-48 object-cover rounded-lg border-2 border-gray-300"
-                    />
-                    <button
-                      type="button"
-                      onClick={removeImage}
-                      className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
-                    >
-                      <IconTrash className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-primary-500 hover:bg-gray-50 transition-colors"
-                  >
-                    <IconImage className="w-8 h-8 text-gray-400" />
-                    <span className="text-sm text-gray-500">Klik untuk upload gambar</span>
-                    <span className="text-xs text-gray-400">Max 10MB (JPG, PNG, GIF)</span>
-                  </button>
-                )}
+                <p className="text-xs text-gray-500 mt-1">
+                  Upload gambar ke <a href="https://catbox.moe" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:underline">Catbox.moe</a> lalu paste URL nya disini
+                </p>
               </div>
 
               <div>
                 <label className="block font-bold mb-2">
-                  {broadcastForm.image ? 'Caption' : 'Pesan'}
+                  {broadcastForm.imageUrl ? 'Caption' : 'Pesan'}
                 </label>
                 <textarea
                   value={broadcastForm.message}
@@ -1041,7 +1017,7 @@ update stock terbaru dari kami:
 klik no dibawah untuk melihat produk
 
 Hubungi admin untuk info lebih lanjut!`}
-                  required={!broadcastForm.image}
+                  required={!broadcastForm.imageUrl}
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Support HTML: &lt;b&gt;bold&lt;/b&gt;, &lt;i&gt;italic&lt;/i&gt;, &lt;code&gt;code&lt;/code&gt;, &lt;a href=""&gt;link&lt;/a&gt;
@@ -1076,7 +1052,7 @@ Hubungi admin untuk info lebih lanjut!`}
                 </button>
                 <button
                   type="submit"
-                  disabled={saving || (!broadcastForm.message && !broadcastForm.image)}
+                  disabled={saving || (!broadcastForm.message && !broadcastForm.imageUrl)}
                   className="neo-btn-primary flex-1 disabled:opacity-50"
                 >
                   {saving ? 'Mengirim...' : 'Kirim Broadcast'}
