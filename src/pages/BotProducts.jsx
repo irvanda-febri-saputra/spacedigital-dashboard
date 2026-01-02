@@ -431,7 +431,15 @@ export default function BotProducts() {
             body: formData
           })
           
-          const uploadData = await uploadResponse.json()
+          let uploadData
+          try {
+            uploadData = await uploadResponse.json()
+          } catch (e) {
+            const responseText = await uploadResponse.text()
+            console.error('Non-JSON response:', uploadResponse.status, responseText)
+            throw new Error(`Server error (${uploadResponse.status}). Make sure VPS has latest code.`)
+          }
+          
           console.log('Upload response:', uploadData)
           
           if (uploadData.success && uploadData.url) {
