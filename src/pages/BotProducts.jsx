@@ -416,9 +416,27 @@ export default function BotProducts() {
       // Upload image first if exists
       let imageUrl = null
       if (broadcastForm.image) {
-        // TODO: Implement image upload to storage
-        // For now, use imagePreview (base64) or skip
-        setToast({ message: 'Image upload belum diimplementasi. Gunakan URL gambar langsung.', type: 'warning' })
+        try {
+          const formData = new FormData()
+          formData.append('reqtype', 'fileupload')
+          formData.append('fileToUpload', broadcastForm.image)
+          
+          const uploadResponse = await fetch('https://catbox.moe/user/api.php', {
+            method: 'POST',
+            body: formData
+          })
+          
+          if (uploadResponse.ok) {
+            imageUrl = await uploadResponse.text()
+            console.log('✅ Image uploaded to Catbox:', imageUrl)
+          } else {
+            throw new Error('Upload failed')
+          }
+        } catch (uploadErr) {
+          console.error('Catbox upload error:', uploadErr)
+          setToast({ message: 'Gagal upload gambar, broadcast hanya text', type: 'warning' })
+          // Continue without image
+        }
       }
 
       // Get first bot (or selected bot)
