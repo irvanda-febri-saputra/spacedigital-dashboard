@@ -417,27 +417,31 @@ export default function BotProducts() {
       let imageUrl = null
       if (broadcastForm.image) {
         try {
-          console.log('📤 Uploading image to Catbox.moe...')
-          const formData = new FormData()
-          formData.append('reqtype', 'fileupload')
-          formData.append('fileToUpload', broadcastForm.image)
+          console.log('📤 Uploading image via backend...')
           
-          const uploadResponse = await fetch('https://catbox.moe/user/api.php', {
+          // Upload to Laravel backend which proxies to Catbox
+          const formData = new FormData()
+          formData.append('image', broadcastForm.image)
+          
+          const uploadResponse = await fetch('/api/dashboard/upload-image', {
             method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
             body: formData
           })
           
-          const responseText = await uploadResponse.text()
-          console.log('Catbox response:', uploadResponse.status, responseText)
+          const uploadData = await uploadResponse.json()
+          console.log('Upload response:', uploadData)
           
-          if (uploadResponse.ok && responseText.startsWith('http')) {
-            imageUrl = responseText.trim()
+          if (uploadData.success && uploadData.url) {
+            imageUrl = uploadData.url
             console.log('✅ Image uploaded:', imageUrl)
           } else {
-            throw new Error(`Upload failed: ${responseText}`)
+            throw new Error(uploadData.error || 'Upload failed')
           }
         } catch (uploadErr) {
-          console.error('❌ Catbox upload error:', uploadErr)
+          console.error('❌ Image upload error:', uploadErr)
           setToast({ 
             message: `Gagal upload gambar: ${uploadErr.message}. Broadcast tetap dikirim (text only)`, 
             type: 'warning' 
