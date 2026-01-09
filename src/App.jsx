@@ -25,6 +25,7 @@ import Notifications from './pages/Notifications'
 import AdminUsers from './pages/AdminUsers'
 import AdminBots from './pages/AdminBots'
 import Stocks from './pages/Stocks'
+import ProductCreate from './pages/ProductCreate'
 
 export default function App() {
   return (
@@ -56,6 +57,7 @@ export default function App() {
           <Route path="transactions/create" element={<CreateTransaction />} />
           <Route path="products" element={<Products />} />
           <Route path="bot-products" element={<BotProducts />} />
+          <Route path="bot-products/create" element={<ProductCreate />} />
           <Route path="stocks" element={<Stocks />} />
           <Route path="order-kuota" element={<OrderKuota />} />
           <Route path="payment-gateways" element={<PaymentGateways />} />

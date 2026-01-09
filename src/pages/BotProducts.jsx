@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import botProductService from '../services/botProductService'
 import NeoToast from '../components/NeoToast'
 import { TableRowSkeleton } from '../components/Skeleton'
@@ -486,13 +487,13 @@ export default function BotProducts() {
           >
             📢 Broadcast
           </button>
-          <button
-            onClick={() => openProductModal()}
+          <Link
+            to="/bot-products/create"
             className="neo-btn-primary inline-flex items-center gap-2"
           >
             <IconPlus className="w-5 h-5" />
             Tambah Produk
-          </button>
+          </Link>
         </div>
       </div>
 
