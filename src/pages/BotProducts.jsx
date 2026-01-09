@@ -633,17 +633,17 @@ export default function BotProducts() {
                   </tr>
                 ))
               ) : (
-                <tr>
+              <tr>
                   <td colSpan={5} className="text-center py-8">
                     <IconPackage className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                     <p className="text-gray-500 mb-4">Belum ada produk</p>
-                    <button
-                      onClick={() => openProductModal()}
+                    <Link
+                      to="/bot-products/create"
                       className="neo-btn-primary neo-btn-sm inline-flex items-center gap-2"
                     >
                       <IconPlus className="w-4 h-4" />
                       Tambah Produk
-                    </button>
+                    </Link>
                   </td>
                 </tr>
               )}

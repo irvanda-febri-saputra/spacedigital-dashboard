@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import stockService from '../services/stockService'
 import botProductService from '../services/botProductService'
@@ -44,11 +44,8 @@ function IconImage({ className }) {
 
 export default function ProductCreate() {
   const navigate = useNavigate()
-  const fileInputRef = useRef(null)
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState(null)
-  const [imagePreview, setImagePreview] = useState(null)
-  const [uploadingImage, setUploadingImage] = useState(false)
 
   // Product form
   const [form, setForm] = useState({
@@ -57,7 +54,6 @@ export default function ProductCreate() {
     description: '',
     category: '',
     price: '',
-    image_url: '',
   })
 
   // Variants array
@@ -197,10 +193,7 @@ export default function ProductCreate() {
 
       {/* Header */}
       <div className="neo-card-flat p-4 mb-6">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <span className="text-2xl">📦</span>
-          Tambah Produk
-        </h1>
+        <h1 className="text-2xl font-bold">Tambah Produk</h1>
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -250,45 +243,16 @@ export default function ProductCreate() {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Kategori */}
-            <div>
-              <label className="block text-sm font-bold mb-2">Kategori</label>
-              <input
-                type="text"
-                value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-                placeholder="Contoh: Musik, Streaming, Gaming"
-                className="neo-input"
-              />
-            </div>
-
-            {/* Gambar */}
-            <div>
-              <label className="block text-sm font-bold mb-2">Gambar Produk</label>
-              <div className="flex items-center gap-3">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="neo-btn-secondary flex items-center gap-2"
-                  disabled={uploadingImage}
-                >
-                  <IconImage className="w-4 h-4" />
-                  {uploadingImage ? 'Uploading...' : 'Choose File'}
-                </button>
-                {imagePreview && (
-                  <img src={imagePreview} alt="Preview" className="w-10 h-10 object-cover rounded border-2 border-black" />
-                )}
-                <span className="text-xs text-gray-500">Format: JPG, PNG, GIF (Max 2MB)</span>
-              </div>
-            </div>
+          {/* Kategori */}
+          <div className="mb-4">
+            <label className="block text-sm font-bold mb-2">Kategori</label>
+            <input
+              type="text"
+              value={form.category}
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
+              placeholder="Contoh: Musik, Streaming, Gaming"
+              className="neo-input"
+            />
           </div>
         </div>
 
