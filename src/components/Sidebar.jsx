@@ -65,6 +65,7 @@ export default function Sidebar({ isOpen, onClose, collapsed, onCollapsedChange 
         { name: 'Payment Gateways', icon: IconCreditCard, href: '/payment-gateways', active: currentPath?.startsWith('/payment-gateways') },
         { name: 'Bot Settings', icon: IconBot, href: '/bots', active: currentPath?.startsWith('/bots') },
         { name: 'Bot Products', icon: IconPackage, href: '/bot-products', active: currentPath === '/bot-products' },
+        { name: 'Kelola Stok', icon: IconPackage, href: '/stocks', active: currentPath === '/stocks' },
         { name: 'Transactions', icon: IconTransaction, href: '/transactions', active: currentPath === '/transactions' },
         { name: 'Create Transaction', icon: IconPlus, href: '/transactions/create', active: currentPath === '/transactions/create' },
         { name: 'Atlantic Withdraw', icon: IconWithdraw, href: '/atlantic-withdraw', active: currentPath?.startsWith('/atlantic-withdraw') },
