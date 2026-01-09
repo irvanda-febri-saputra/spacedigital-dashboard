@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import botProductService from '../services/botProductService'
+import stockService from '../services/stockService'
 import NeoToast from '../components/NeoToast'
 import { TableRowSkeleton } from '../components/Skeleton'
 
@@ -706,6 +707,61 @@ export default function BotProducts() {
                 />
                 <label htmlFor="is_active" className="font-bold">Produk Aktif</label>
               </div>
+
+              {/* Add Variant Section - only in edit mode */}
+              {editingProduct && (
+                <div className="border-t pt-4">
+                  <h3 className="font-bold mb-3">Tambah Variant Baru</h3>
+                  <div className="grid grid-cols-3 gap-2">
+                    <input
+                      type="text"
+                      value={variantForm.variant_code}
+                      onChange={(e) => setVariantForm({ ...variantForm, variant_code: e.target.value.toUpperCase() })}
+                      className="neo-input text-sm py-2"
+                      placeholder="Kode Variant"
+                    />
+                    <input
+                      type="text"
+                      value={variantForm.name}
+                      onChange={(e) => setVariantForm({ ...variantForm, name: e.target.value })}
+                      className="neo-input text-sm py-2"
+                      placeholder="Nama Variant"
+                    />
+                    <input
+                      type="number"
+                      value={variantForm.price}
+                      onChange={(e) => setVariantForm({ ...variantForm, price: e.target.value })}
+                      className="neo-input text-sm py-2"
+                      placeholder="Harga"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!variantForm.name) {
+                        setToast({ message: 'Nama variant wajib diisi', type: 'error' })
+                        return
+                      }
+                      try {
+                        await stockService.addVariant(editingProduct.id, {
+                          variant_code: variantForm.variant_code || `${productForm.product_code}_${variantForm.name}`.toUpperCase().replace(/\s+/g, '_'),
+                          name: variantForm.name,
+                          price: parseFloat(variantForm.price) || 0,
+                        })
+                        setToast({ message: 'Variant berhasil ditambahkan!', type: 'success' })
+                        setVariantForm({ name: '', variant_code: '', price: '' })
+                        fetchProducts() // Refresh list
+                      } catch (err) {
+                        setToast({ message: 'Gagal menambah variant', type: 'error' })
+                      }
+                    }}
+                    className="neo-btn-primary neo-btn-sm mt-2 w-full"
+                  >
+                    <IconPlus className="w-4 h-4 inline mr-1" />
+                    Tambah Variant
+                  </button>
+                </div>
+              )}
 
               <div className="flex gap-3 pt-4 border-t border-gray-200">
                 <button
