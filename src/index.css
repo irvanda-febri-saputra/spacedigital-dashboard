@@ -230,6 +230,49 @@
     background-color: rgba(239, 68, 68, 0.05);
   }
   
+  /* Neo Btn Info - Cyan/Teal color */
+  .neo-btn-info {
+    @apply px-3 py-1.5 rounded-lg font-bold text-xs transition-all duration-200;
+    background-color: #06b6d4;
+    color: white;
+    border: 2px solid var(--border-dark);
+    box-shadow: 3px 3px 0 var(--border-dark);
+  }
+  
+  .neo-btn-info:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--border-dark);
+    background-color: #0891b2;
+  }
+  
+  /* Neo Btn Warning - Yellow/Orange color */
+  .neo-btn-warning {
+    @apply px-3 py-1.5 rounded-lg font-bold text-xs transition-all duration-200;
+    background-color: #f59e0b;
+    color: white;
+    border: 2px solid var(--border-dark);
+    box-shadow: 3px 3px 0 var(--border-dark);
+  }
+  
+  .neo-btn-warning:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--border-dark);
+    background-color: #d97706;
+  }
+  
+  /* Neo Btn Small - Smaller padding */
+  .neo-btn-sm {
+    @apply px-2 py-1 text-xs;
+  }
+  
+  .neo-btn-sm.neo-btn-danger {
+    @apply px-2 py-1 text-xs rounded font-bold;
+    background-color: var(--danger);
+    color: white;
+    border: 2px solid var(--border-dark);
+    box-shadow: 2px 2px 0 var(--border-dark);
+  }
+  
   /* Neo Badge */
   .neo-badge {
     @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold;

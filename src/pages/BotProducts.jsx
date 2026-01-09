@@ -477,16 +477,10 @@ export default function BotProducts() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black">Bot Products</h1>
-          <p className="text-gray-600 mt-1">Kelola produk langsung di bot Telegram</p>
+          <h1 className="text-3xl font-black">Kelola Produk</h1>
+          <p className="text-gray-600 mt-1">Kelola produk untuk bot Telegram</p>
         </div>
         <div className="flex gap-2">
-          <button
-            onClick={openBroadcastModal}
-            className="neo-btn-secondary inline-flex items-center gap-2"
-          >
-            📢 Broadcast
-          </button>
           <Link
             to="/bot-products/create"
             className="neo-btn-primary inline-flex items-center gap-2"
@@ -527,114 +521,77 @@ export default function BotProducts() {
           <table className="neo-table">
             <thead>
               <tr>
-                <th>Produk</th>
-                <th>Harga</th>
-                <th className="text-center">Stock</th>
-                <th>Varian</th>
+                <th>Kode Barang</th>
+                <th>Nama Produk</th>
+                <th className="text-center">Jumlah Variant</th>
+                <th>Kategori</th>
+                <th className="text-center">Total Terjual</th>
                 <th className="text-center">Aksi</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <>
-                  <TableRowSkeleton cols={5} />
-                  <TableRowSkeleton cols={5} />
-                  <TableRowSkeleton cols={5} />
-                  <TableRowSkeleton cols={5} />
-                  <TableRowSkeleton cols={5} />
+                  <TableRowSkeleton cols={6} />
+                  <TableRowSkeleton cols={6} />
+                  <TableRowSkeleton cols={6} />
+                  <TableRowSkeleton cols={6} />
+                  <TableRowSkeleton cols={6} />
                 </>
               ) : paginatedProducts.length > 0 ? (
                 paginatedProducts.map((product) => (
                   <tr key={product.id}>
                     <td>
-                      <div>
-                        <p className="font-medium text-gray-900">{product.name}</p>
-                        <p className="text-xs text-gray-500 font-mono">{product.product_code}</p>
-                        {product.description && (
-                          <p className="text-xs text-gray-400 truncate max-w-xs">{product.description}</p>
-                        )}
-                      </div>
-                    </td>
-                    <td className="font-bold text-primary-500 font-mono">
-                      {formatPrice(product.price)}
-                    </td>
-                    <td className="text-center align-middle">
-                      <span className={`neo-badge-${
-                        product.stock_count > 10 ? 'success' :
-                        product.stock_count > 0 ? 'warning' : 'danger'
-                      }`}>
-                        {product.stock_count}
+                      <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+                        {product.product_code || '-'}
                       </span>
                     </td>
-                    <td className="align-top">
-                      {Array.isArray(product.variants) && product.variants.length > 0 ? (
-                        <div className="space-y-1">
-                          {(Array.isArray(product.variants) ? product.variants : []).slice(0, 3).map(v => (
-                            <div key={v.id} className="flex items-center gap-2 text-xs">
-                              <span className="font-medium text-gray-700 whitespace-nowrap">{v.name}</span>
-                              <span className="font-mono text-primary-500 whitespace-nowrap">{formatPrice(v.price)}</span>
-                              <span className="font-mono text-gray-400 whitespace-nowrap">({v.stock_count})</span>
-                              <button
-                                onClick={() => openStockModal(product, v)}
-                                className="text-green-500 hover:text-green-700"
-                                title="Add Stock"
-                              >
-                                <IconPlus className="w-3 h-3" />
-                              </button>
-                              <button
-                                onClick={() => openVariantModal(product, v)}
-                                className="text-primary-500 hover:text-primary-700"
-                                title="Edit Variant"
-                              >
-                                <IconEdit className="w-3 h-3" />
-                              </button>
-                            </div>
-                          ))}
-                          {product.variants.length > 3 && (
-                            <p className="text-xs text-gray-400">+{product.variants.length - 3} lainnya</p>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-gray-400">-</span>
-                      )}
+                    <td>
+                      <p className="font-medium text-gray-900">{product.name}</p>
                     </td>
-                    <td className="align-top">
-                      <div className="flex items-center justify-center gap-2">
+                    <td className="text-center">
+                      <span className="neo-badge-primary">
+                        {Array.isArray(product.variants) ? product.variants.length : 0} Variant
+                      </span>
+                    </td>
+                    <td>
+                      <span className="text-gray-600">{product.category || '-'}</span>
+                    </td>
+                    <td className="text-center">
+                      <span className="font-bold text-primary-600">
+                        {product.sold_count || 0}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="flex items-center justify-center gap-1">
                         <button
-                          onClick={() => openStockModal(product)}
-                          className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
-                          title="Add Stock"
+                          onClick={() => openProductModal(product)}
+                          className="neo-btn-sm neo-btn-info"
+                          title="Detail"
                         >
-                          <IconPackage className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => openVariantModal(product)}
-                          className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
-                          title="Add Variant"
-                        >
-                          <IconPlus className="w-4 h-4" />
+                          Detail
                         </button>
                         <button
                           onClick={() => openProductModal(product)}
-                          className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
-                          title="Edit Product"
+                          className="neo-btn-sm neo-btn-warning"
+                          title="Edit"
                         >
-                          <IconEdit className="w-4 h-4" />
+                          Edit
                         </button>
                         <button
                           onClick={() => setDeleteConfirm(product)}
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Delete Product"
+                          className="neo-btn-sm neo-btn-danger"
+                          title="Hapus"
                         >
-                          <IconTrash className="w-4 h-4" />
+                          Hapus
                         </button>
                       </div>
                     </td>
                   </tr>
                 ))
               ) : (
-              <tr>
-                  <td colSpan={5} className="text-center py-8">
+                <tr>
+                  <td colSpan={6} className="text-center py-8">
                     <IconPackage className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                     <p className="text-gray-500 mb-4">Belum ada produk</p>
                     <Link
