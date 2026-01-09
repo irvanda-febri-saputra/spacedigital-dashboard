@@ -81,8 +81,9 @@ export default function BotProducts() {
   
   // Modal states
   const [showModal, setShowModal] = useState(false)
-  const [modalType, setModalType] = useState('product') // product, stock, variant, broadcast
+  const [modalType, setModalType] = useState('product') // product, stock, variant, broadcast, detail
   const [editingProduct, setEditingProduct] = useState(null)
+  const [detailProduct, setDetailProduct] = useState(null)
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [selectedVariant, setSelectedVariant] = useState(null)
   const [deleteConfirm, setDeleteConfirm] = useState(null)
@@ -186,20 +187,22 @@ export default function BotProducts() {
       name: product.name || '',
       product_code: product.product_code || '',
       description: product.description || '',
-      price: product.price || '',
-      category: product.category || 'Digital Product',
-      terms: product.terms || '',
+      category: product.category || '',
       is_active: product.is_active ? 1 : 0
     } : {
       name: '',
       product_code: '',
       description: '',
-      price: '',
-      category: 'Digital Product',
-      terms: '',
+      category: '',
       is_active: 1
     })
     setModalType('product')
+    setShowModal(true)
+  }
+
+  const openDetailModal = (product) => {
+    setDetailProduct(product)
+    setModalType('detail')
     setShowModal(true)
   }
 
@@ -565,7 +568,7 @@ export default function BotProducts() {
                     <td>
                       <div className="flex items-center justify-center gap-1">
                         <button
-                          onClick={() => openProductModal(product)}
+                          onClick={() => openDetailModal(product)}
                           className="neo-btn-sm neo-btn-info"
                           title="Detail"
                         >
@@ -646,50 +649,40 @@ export default function BotProducts() {
               </h2>
             </div>
             <form onSubmit={handleProductSubmit} className="p-6 space-y-4">
-              <div>
-                <label className="block font-bold mb-2">Nama Produk *</label>
-                <input
-                  type="text"
-                  value={productForm.name}
-                  onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-                  required
-                  className="neo-input"
-                  placeholder="Netflix Premium 1 Bulan"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold mb-2">Kode Produk</label>
-                <input
-                  type="text"
-                  value={productForm.product_code}
-                  onChange={(e) => setProductForm({ ...productForm, product_code: e.target.value })}
-                  className="neo-input"
-                  placeholder="NETFLIX_1M (auto-generate jika kosong)"
-                />
-              </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold mb-2">Harga</label>
+                  <label className="block font-bold mb-2">Kode Barang *</label>
                   <input
-                    type="number"
-                    value={productForm.price}
-                    onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
+                    type="text"
+                    value={productForm.product_code}
+                    onChange={(e) => setProductForm({ ...productForm, product_code: e.target.value.toUpperCase() })}
+                    required
                     className="neo-input"
-                    placeholder="25000"
+                    placeholder="NETFLIX"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold mb-2">Kategori</label>
+                  <label className="block font-bold mb-2">Nama Produk *</label>
                   <input
                     type="text"
-                    value={productForm.category}
-                    onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                    value={productForm.name}
+                    onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                    required
                     className="neo-input"
-                    placeholder="Digital Product"
+                    placeholder="Netflix Premium"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block font-bold mb-2">Kategori</label>
+                <input
+                  type="text"
+                  value={productForm.category}
+                  onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                  className="neo-input"
+                  placeholder="Streaming, Musik, Gaming"
+                />
               </div>
 
               <div>
@@ -700,17 +693,6 @@ export default function BotProducts() {
                   rows={3}
                   className="neo-input"
                   placeholder="Deskripsi produk..."
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold mb-2">Syarat & Ketentuan</label>
-                <textarea
-                  value={productForm.terms}
-                  onChange={(e) => setProductForm({ ...productForm, terms: e.target.value })}
-                  rows={3}
-                  className="neo-input"
-                  placeholder="S&K yang akan ditampilkan ke pembeli..."
                 />
               </div>
 
@@ -738,13 +720,117 @@ export default function BotProducts() {
                   disabled={saving}
                   className="neo-btn-primary flex-1"
                 >
-                  {saving ? 'Menyimpan...' : (editingProduct ? 'Update' : 'Simpan')}
+                  {saving ? 'Menyimpan...' : 'Update'}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      {/* Detail Modal */}
+      {showModal && modalType === 'detail' && detailProduct && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white border-2 border-gray-200 rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center border-b border-gray-200 p-4">
+              <h2 className="text-xl font-bold text-gray-900">Detail Produk</h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-gray-400 hover:text-gray-600 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              {/* Product Info */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-500">Kode Barang</label>
+                  <p className="font-bold text-lg font-mono">{detailProduct.product_code || '-'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-500">Nama Produk</label>
+                  <p className="font-bold text-lg">{detailProduct.name}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-500">Kategori</label>
+                  <p className="font-medium">{detailProduct.category || '-'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-500">Status</label>
+                  <span className={`neo-badge-${detailProduct.is_active ? 'success' : 'danger'}`}>
+                    {detailProduct.is_active ? 'Aktif' : 'Nonaktif'}
+                  </span>
+                </div>
+              </div>
+
+              {detailProduct.description && (
+                <div>
+                  <label className="block text-sm text-gray-500">Deskripsi</label>
+                  <p className="text-gray-700">{detailProduct.description}</p>
+                </div>
+              )}
+
+              {/* Variants */}
+              <div className="border-t pt-4">
+                <h3 className="font-bold mb-3">Variant Produk ({Array.isArray(detailProduct.variants) ? detailProduct.variants.length : 0})</h3>
+                {Array.isArray(detailProduct.variants) && detailProduct.variants.length > 0 ? (
+                  <div className="space-y-2">
+                    {detailProduct.variants.map(v => (
+                      <div key={v.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border">
+                        <div>
+                          <span className="font-mono text-xs bg-gray-200 px-2 py-0.5 rounded mr-2">{v.variant_code}</span>
+                          <span className="font-medium">{v.name}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="font-bold text-primary-600">Rp {(v.price || 0).toLocaleString('id-ID')}</span>
+                          <span className="text-sm text-gray-400 ml-2">(Stok: {v.stock_count || 0})</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-400 text-center py-4">Belum ada variant</p>
+                )}
+              </div>
+
+              {/* Stats */}
+              <div className="grid grid-cols-2 gap-4 border-t pt-4">
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <p className="text-2xl font-bold text-green-600">{detailProduct.stock_count || 0}</p>
+                  <p className="text-sm text-green-700">Total Stok</p>
+                </div>
+                <div className="text-center p-4 bg-purple-50 rounded-lg">
+                  <p className="text-2xl font-bold text-purple-600">{detailProduct.sold_count || 0}</p>
+                  <p className="text-sm text-purple-700">Total Terjual</p>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4 border-t">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="neo-btn-secondary flex-1"
+                >
+                  Tutup
+                </button>
+                <button
+                  onClick={() => {
+                    setShowModal(false)
+                    openProductModal(detailProduct)
+                  }}
+                  className="neo-btn-primary flex-1"
+                >
+                  Edit Produk
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {/* Stock Modal */}
       {showModal && modalType === 'stock' && (
