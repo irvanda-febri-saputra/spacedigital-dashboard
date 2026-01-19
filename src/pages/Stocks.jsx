@@ -1,6 +1,81 @@
 import { useState, useEffect } from 'react'
 import stockService from '../services/stockService'
 import NeoToast from '../components/NeoToast'
+import { TableRowSkeleton } from '../components/Skeleton'
+
+// Icons
+function IconPlus({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"></line>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+    </svg>
+  )
+}
+
+function IconSearch({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+  )
+}
+
+function IconTrash({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3 6 5 6 21 6"></polyline>
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+    </svg>
+  )
+}
+
+function IconLink({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+    </svg>
+  )
+}
+
+function IconCopy({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+    </svg>
+  )
+}
+
+function IconRefresh({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="23 4 23 10 17 10"></polyline>
+      <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+    </svg>
+  )
+}
+
+function IconPackage({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+      <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+      <line x1="12" y1="22.08" x2="12" y2="12"></line>
+    </svg>
+  )
+}
+
+function IconX({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+  )
+}
 
 // Hastebin URL
 const HASTEBIN_URL = 'https://sumini.prabowo23.my.id'
@@ -100,7 +175,7 @@ export default function Stocks() {
       
       const response = await stockService.getStocks(params)
       setStocks(response.data || response || [])
-      setHastebinLink('') // Reset hastebin link when changing selection
+      setHastebinLink('')
     } catch (error) {
       setStocks([])
     } finally {
@@ -132,12 +207,11 @@ export default function Stocks() {
       setForm({ product_id: '', variant_id: '', data: '' })
       setFormVariants([])
       
-      // Refresh if same product
       if (form.product_id === selectedProduct) {
         fetchStocksForProduct(selectedProduct, selectedVariant)
       }
       fetchStats()
-      fetchProducts() // Refresh product counts
+      fetchProducts()
     } catch (error) {
       showToast(error.response?.data?.message || 'Gagal menambah stock', 'error')
     } finally {
@@ -158,7 +232,7 @@ export default function Stocks() {
     }
   }
 
-  // Generate Hastebin link for current stocks
+  // Generate Hastebin link via backend proxy
   const generateHastebinLink = async () => {
     if (stocks.length === 0) {
       showToast('Tidak ada stock untuk di-export', 'error')
@@ -168,12 +242,11 @@ export default function Stocks() {
     try {
       setHastebinLoading(true)
       
-      // Get product name
       const product = products.find(p => p.id == selectedProduct)
       const variant = variants.find(v => v.id == selectedVariant)
       
       let text = '═══════════════════════════════════════\n'
-      text += `   📦 STOCK: ${product?.name || 'Unknown'}`
+      text += `   STOCK: ${product?.name || 'Unknown'}`
       if (variant) text += ` - ${variant.name}`
       text += '\n═══════════════════════════════════════\n\n'
       
@@ -182,27 +255,21 @@ export default function Stocks() {
       })
       
       text += '\n═══════════════════════════════════════\n'
-      text += `📊 Total: ${stocks.length} akun\n`
-      text += `⏰ Generated: ${new Date().toLocaleString('id-ID')}\n`
+      text += `Total: ${stocks.length} akun\n`
+      text += `Generated: ${new Date().toLocaleString('id-ID')}\n`
       text += '═══════════════════════════════════════'
 
-      // Post to hastebin
-      const response = await fetch(`${HASTEBIN_URL}/documents`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: text
-      })
+      // Use backend proxy to avoid CORS
+      const response = await stockService.generateHastebin(text)
       
-      const data = await response.json()
-      
-      if (data.key) {
-        const link = `${HASTEBIN_URL}/${data.key}`
-        setHastebinLink(link)
+      if (response.url) {
+        setHastebinLink(response.url)
         showToast('Link Hastebin berhasil dibuat!', 'success')
       } else {
-        throw new Error('No key returned')
+        throw new Error('No URL returned')
       }
     } catch (error) {
+      console.error('Hastebin error:', error)
       showToast('Gagal membuat link Hastebin', 'error')
     } finally {
       setHastebinLoading(false)
@@ -228,52 +295,74 @@ export default function Stocks() {
   }
 
   return (
-    <div className="p-4 md:p-6 max-w-4xl mx-auto">
+    <div className="space-y-6">
       {/* Toast */}
       {toast && <NeoToast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">📦 Kelola Stok</h1>
-          <p className="text-gray-500 text-sm">Pilih produk untuk melihat stok</p>
+          <h1 className="text-3xl font-black">Stocks</h1>
+          <p className="text-gray-600 mt-1">Kelola stok produk untuk bot Telegram</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 flex items-center gap-2 text-sm"
+          className="neo-btn-primary inline-flex items-center gap-2"
         >
-          ➕ Tambah
+          <IconPlus className="w-5 h-5" />
+          Tambah Stok
         </button>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
-          <p className="text-2xl font-bold">{stats.total}</p>
-          <p className="text-xs text-gray-500">Total</p>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-white border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-purple-200 border-2 border-black">
+              <IconPackage className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Total Stok</p>
+              <p className="text-2xl font-black">{stats.total}</p>
+            </div>
+          </div>
         </div>
-        <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
-          <p className="text-2xl font-bold text-green-600">{stats.available}</p>
-          <p className="text-xs text-gray-500">Tersedia</p>
+        <div className="bg-white border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-green-200 border-2 border-black">
+              <IconPackage className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Tersedia</p>
+              <p className="text-2xl font-black text-green-600">{stats.available}</p>
+            </div>
+          </div>
         </div>
-        <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-center">
-          <p className="text-2xl font-bold text-orange-600">{stats.sold}</p>
-          <p className="text-xs text-gray-500">Terjual</p>
+        <div className="bg-white border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-orange-200 border-2 border-black">
+              <IconPackage className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Terjual</p>
+              <p className="text-2xl font-black text-orange-600">{stats.sold}</p>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Product Selector */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="neo-card p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Produk</label>
+            <label className="block font-bold mb-2">Pilih Produk</label>
             <select
               value={selectedProduct}
               onChange={(e) => {
                 setSelectedProduct(e.target.value)
                 setSelectedVariant('')
               }}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="neo-input"
             >
               <option value="">-- Pilih Produk --</option>
               {products.map(p => (
@@ -286,11 +375,11 @@ export default function Stocks() {
           
           {variants.length > 0 && (
             <div>
-              <label className="block text-sm font-medium mb-1">Variant</label>
+              <label className="block font-bold mb-2">Pilih Variant</label>
               <select
                 value={selectedVariant}
                 onChange={(e) => setSelectedVariant(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                className="neo-input"
               >
                 <option value="">-- Semua Variant --</option>
                 {variants.map(v => (
@@ -305,108 +394,144 @@ export default function Stocks() {
       </div>
 
       {/* Stock List */}
-      {selectedProduct && (
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      {selectedProduct ? (
+        <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
           {/* Header */}
-          <div className="bg-gray-50 border-b border-gray-200 p-3 flex justify-between items-center">
-            <span className="font-medium text-sm">
-              📋 {stocks.length} stok tersedia
-            </span>
+          <div className="bg-yellow-300 border-b-4 border-black p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div className="flex items-center gap-2">
+              <IconPackage className="w-5 h-5" />
+              <span className="font-bold">{stocks.length} stok tersedia</span>
+            </div>
             <div className="flex gap-2">
               <button
                 onClick={() => fetchStocksForProduct(selectedProduct, selectedVariant)}
-                className="text-gray-500 hover:text-black px-2 py-1 text-sm"
-                title="Refresh"
+                className="neo-btn-outline-primary px-3 py-2 flex items-center gap-2"
               >
-                🔄
+                <IconRefresh className="w-4 h-4" />
+                Refresh
               </button>
               <button
                 onClick={generateHastebinLink}
                 disabled={hastebinLoading || stocks.length === 0}
-                className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 disabled:opacity-50"
+                className="neo-btn-primary px-3 py-2 flex items-center gap-2 disabled:opacity-50"
               >
-                {hastebinLoading ? '...' : '🔗 Hastebin'}
+                <IconLink className="w-4 h-4" />
+                {hastebinLoading ? 'Loading...' : 'Hastebin'}
               </button>
             </div>
           </div>
 
           {/* Hastebin Link */}
           {hastebinLink && (
-            <div className="bg-blue-50 border-b border-blue-100 p-3 flex items-center justify-between">
+            <div className="bg-blue-100 border-b-4 border-black p-3 flex items-center justify-between">
               <a 
                 href={hastebinLink} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:underline text-sm truncate flex-1"
+                className="text-blue-700 font-mono hover:underline truncate flex-1"
               >
-                🔗 {hastebinLink}
+                {hastebinLink}
               </a>
               <button
                 onClick={() => copyToClipboard(hastebinLink)}
-                className="ml-2 text-blue-600 hover:text-blue-800 text-sm"
+                className="ml-3 p-2 border-2 border-black bg-white hover:bg-gray-100"
               >
-                📋 Copy
+                <IconCopy className="w-4 h-4" />
               </button>
             </div>
           )}
 
           {/* Stock Items */}
-          <div className="divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
+          <div className="max-h-[500px] overflow-y-auto">
             {stockLoading ? (
-              <div className="p-8 text-center text-gray-400">Loading...</div>
+              <div className="p-8 text-center text-gray-500">Loading...</div>
             ) : stocks.length === 0 ? (
-              <div className="p-8 text-center text-gray-400">
-                📦
-                <p className="mt-2">Tidak ada stok</p>
+              <div className="p-12 text-center">
+                <IconPackage className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                <p className="text-gray-500 font-bold">Tidak ada stok tersedia</p>
               </div>
             ) : (
-              stocks.map((stock, idx) => (
-                <div key={stock.id} className="p-3 hover:bg-gray-50 flex items-center justify-between group">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-400 text-xs w-6">{idx + 1}.</span>
-                      <code className="text-sm truncate flex-1">{stock.data}</code>
-                      <button
-                        onClick={() => copyToClipboard(stock.data)}
-                        className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600 text-xs"
-                      >
-                        📋
-                      </button>
-                    </div>
-                    {stock.variant && (
-                      <span className="text-xs text-purple-600 ml-8">{stock.variant.name}</span>
+              <table className="w-full">
+                <thead className="bg-gray-100 border-b-4 border-black">
+                  <tr>
+                    <th className="text-left p-3 font-bold">#</th>
+                    <th className="text-left p-3 font-bold">Data</th>
+                    {!selectedVariant && variants.length > 0 && (
+                      <th className="text-left p-3 font-bold">Variant</th>
                     )}
-                  </div>
-                  <button
-                    onClick={() => setDeleteConfirm(stock)}
-                    className="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 text-sm ml-2"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              ))
+                    <th className="text-right p-3 font-bold">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stocks.map((stock, idx) => (
+                    <tr key={stock.id} className="border-b-2 border-gray-200 hover:bg-gray-50">
+                      <td className="p-3 text-gray-500 font-mono">{idx + 1}</td>
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          <code className="text-sm bg-gray-100 px-2 py-1 border border-gray-300 truncate max-w-xs">
+                            {stock.data}
+                          </code>
+                          <button
+                            onClick={() => copyToClipboard(stock.data)}
+                            className="p-1 text-gray-400 hover:text-black"
+                          >
+                            <IconCopy className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                      {!selectedVariant && variants.length > 0 && (
+                        <td className="p-3">
+                          {stock.variant && (
+                            <span className="bg-purple-100 border-2 border-black px-2 py-1 text-sm font-medium">
+                              {stock.variant.name}
+                            </span>
+                          )}
+                        </td>
+                      )}
+                      <td className="p-3 text-right">
+                        <button
+                          onClick={() => setDeleteConfirm(stock)}
+                          className="p-2 text-red-600 hover:bg-red-50 border-2 border-transparent hover:border-red-200"
+                        >
+                          <IconTrash className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </div>
         </div>
-      )}
-
-      {/* Empty State */}
-      {!selectedProduct && !loading && (
-        <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-12 text-center">
-          <p className="text-4xl mb-2">📦</p>
-          <p className="text-gray-500">Pilih produk untuk melihat stok</p>
+      ) : (
+        <div className="bg-white border-4 border-black p-12 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <IconPackage className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+          <h3 className="text-xl font-bold mb-2">Pilih Produk</h3>
+          <p className="text-gray-600">Pilih produk dari dropdown di atas untuk melihat stok</p>
         </div>
       )}
 
       {/* Add Stock Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg w-full max-w-md p-5">
-            <h2 className="text-lg font-bold mb-4">➕ Tambah Stok</h2>
+          <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="border-b-4 border-black p-4 bg-yellow-300 flex justify-between items-center">
+              <h2 className="text-xl font-black">Tambah Stok</h2>
+              <button 
+                onClick={() => {
+                  setShowAddModal(false)
+                  setForm({ product_id: '', variant_id: '', data: '' })
+                  setFormVariants([])
+                }}
+                className="p-1 hover:bg-yellow-400"
+              >
+                <IconX className="w-6 h-6" />
+              </button>
+            </div>
 
-            <form onSubmit={handleAddStock} className="space-y-4">
+            <form onSubmit={handleAddStock} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Produk *</label>
+                <label className="block font-bold mb-2">Produk *</label>
                 <select
                   value={form.product_id}
                   onChange={(e) => {
@@ -414,7 +539,7 @@ export default function Stocks() {
                     if (e.target.value) fetchFormVariants(e.target.value)
                     else setFormVariants([])
                   }}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                  className="neo-input"
                   required
                 >
                   <option value="">-- Pilih Produk --</option>
@@ -426,11 +551,11 @@ export default function Stocks() {
 
               {form.product_id && formVariants.length > 0 && (
                 <div>
-                  <label className="block text-sm font-medium mb-1">Variant</label>
+                  <label className="block font-bold mb-2">Variant</label>
                   <select
                     value={form.variant_id}
                     onChange={(e) => setForm({ ...form, variant_id: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                    className="neo-input"
                   >
                     <option value="">-- Tanpa Variant --</option>
                     {formVariants.map(v => (
@@ -441,20 +566,20 @@ export default function Stocks() {
               )}
 
               <div>
-                <label className="block text-sm font-medium mb-1">Data Stok *</label>
+                <label className="block font-bold mb-2">Data Stok *</label>
                 <textarea
                   value={form.data}
                   onChange={(e) => setForm({ ...form, data: e.target.value })}
                   placeholder="email@example.com|password123&#10;email2@example.com|password456"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 h-32 font-mono text-sm resize-none"
+                  className="neo-input h-40 resize-none font-mono text-sm"
                   required
                 />
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-sm text-gray-500 mt-1">
                   Satu akun per baris. Format: email|password
                 </p>
               </div>
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex gap-3 pt-4">
                 <button
                   type="button"
                   onClick={() => {
@@ -462,16 +587,16 @@ export default function Stocks() {
                     setForm({ product_id: '', variant_id: '', data: '' })
                     setFormVariants([])
                   }}
-                  className="flex-1 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 text-sm"
+                  className="neo-btn-secondary flex-1"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 disabled:opacity-50 text-sm"
+                  className="neo-btn-primary flex-1"
                 >
-                  {saving ? 'Menyimpan...' : 'Simpan'}
+                  {saving ? 'Menyimpan...' : 'Simpan Stok'}
                 </button>
               </div>
             </form>
@@ -482,20 +607,22 @@ export default function Stocks() {
       {/* Delete Confirmation */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg w-full max-w-sm p-5 text-center">
-            <p className="text-4xl mb-3">🗑️</p>
-            <h3 className="font-bold mb-2">Hapus stok ini?</h3>
-            <code className="text-sm text-gray-600 block truncate mb-4">{deleteConfirm.data}</code>
+          <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] w-full max-w-md p-6 text-center">
+            <IconTrash className="w-16 h-16 mx-auto mb-4 text-red-500" />
+            <h3 className="text-xl font-bold mb-2">Hapus Stok?</h3>
+            <code className="text-sm text-gray-600 bg-gray-100 px-3 py-1 border block truncate mb-6">
+              {deleteConfirm.data}
+            </code>
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 text-sm"
+                className="neo-btn-secondary flex-1"
               >
                 Batal
               </button>
               <button
                 onClick={() => handleDelete(deleteConfirm.id)}
-                className="flex-1 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 text-sm"
+                className="neo-btn-danger flex-1"
               >
                 Hapus
               </button>

@@ -65,6 +65,12 @@ const stockService = {
   async deleteVariant(variantId) {
     const response = await api.delete(`/dashboard/variants/${variantId}`)
     return response.data
+  },
+
+  // Generate Hastebin link via backend proxy
+  async generateHastebin(text) {
+    const response = await api.post('/dashboard/stocks/hastebin', { text })
+    return response.data
   }
 }
 
