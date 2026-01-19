@@ -1,98 +1,33 @@
 import { useState, useEffect } from 'react'
 import stockService from '../services/stockService'
 import NeoToast from '../components/NeoToast'
-import { TableRowSkeleton } from '../components/Skeleton'
 
-// Icons
-function IconPlus({ className }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="12" y1="5" x2="12" y2="19"></line>
-      <line x1="5" y1="12" x2="19" y2="12"></line>
-    </svg>
-  )
-}
-
-function IconSearch({ className }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="8"></circle>
-      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-    </svg>
-  )
-}
-
-function IconTrash({ className }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="3 6 5 6 21 6"></polyline>
-      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-    </svg>
-  )
-}
-
-function IconEdit({ className }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-    </svg>
-  )
-}
-
-function IconPackage({ className }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-      <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-      <line x1="12" y1="22.08" x2="12" y2="12"></line>
-    </svg>
-  )
-}
-
-function IconRefresh({ className }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="23 4 23 10 17 10"></polyline>
-      <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-    </svg>
-  )
-}
-
-function IconX({ className }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="18" y1="6" x2="6" y2="18"></line>
-      <line x1="6" y1="6" x2="18" y2="18"></line>
-    </svg>
-  )
-}
+// Hastebin URL
+const HASTEBIN_URL = 'https://sumini.prabowo23.my.id'
 
 export default function Stocks() {
-  const [stocks, setStocks] = useState([])
   const [products, setProducts] = useState([])
   const [variants, setVariants] = useState([])
   const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
   const [toast, setToast] = useState(null)
   const [stats, setStats] = useState({ total: 0, available: 0, sold: 0 })
 
-  // Filters - Default to show only available stocks
-  const [filterProduct, setFilterProduct] = useState('')
-  const [filterVariant, setFilterVariant] = useState('')
-  const [filterStatus, setFilterStatus] = useState('available') // Default: show only available
+  // Product selection
+  const [selectedProduct, setSelectedProduct] = useState('')
+  const [selectedVariant, setSelectedVariant] = useState('')
 
-  // View Mode
-  const [viewMode, setViewMode] = useState('grouped') // 'grouped' or 'table'
-  const [expandedProducts, setExpandedProducts] = useState({})
-
-  // Pagination
-  const [pagination, setPagination] = useState({ page: 1, total: 0, per_page: 20 })
+  // Stocks for selected product
+  const [stocks, setStocks] = useState([])
+  const [stockLoading, setStockLoading] = useState(false)
 
   // Modal
-  const [showModal, setShowModal] = useState(false)
+  const [showAddModal, setShowAddModal] = useState(false)
   const [saving, setSaving] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(null)
+
+  // Hastebin
+  const [hastebinLoading, setHastebinLoading] = useState(false)
+  const [hastebinLink, setHastebinLink] = useState('')
 
   // Form
   const [form, setForm] = useState({
@@ -101,78 +36,75 @@ export default function Stocks() {
     data: ''
   })
 
+  // Form variants (separate from filter variants)
+  const [formVariants, setFormVariants] = useState([])
+
   useEffect(() => {
     fetchProducts()
-    fetchStocks()
     fetchStats()
   }, [])
 
   useEffect(() => {
-    if (filterProduct) {
-      fetchVariantsForProduct(filterProduct)
+    if (selectedProduct) {
+      fetchVariantsForProduct(selectedProduct)
+      fetchStocksForProduct(selectedProduct, selectedVariant)
     } else {
       setVariants([])
-      setFilterVariant('')
+      setSelectedVariant('')
+      setStocks([])
     }
-  }, [filterProduct])
+  }, [selectedProduct])
+
+  useEffect(() => {
+    if (selectedProduct) {
+      fetchStocksForProduct(selectedProduct, selectedVariant)
+    }
+  }, [selectedVariant])
 
   const fetchProducts = async () => {
     try {
+      setLoading(true)
       const response = await stockService.getProducts()
-      // Handle different response formats
-      if (response.data) {
-        setProducts(response.data)
-      } else if (Array.isArray(response)) {
-        setProducts(response)
-      }
+      const data = response.data || response || []
+      setProducts(data)
     } catch (error) {
-      console.error('Failed to fetch products:', error)
+      showToast('Gagal memuat produk', 'error')
+    } finally {
+      setLoading(false)
     }
   }
 
   const fetchVariantsForProduct = async (productId) => {
     try {
       const response = await stockService.getProductVariants(productId)
-      if (response.data) {
-        setVariants(response.data)
-      } else if (Array.isArray(response)) {
-        setVariants(response)
-      }
+      setVariants(response.data || response || [])
     } catch (error) {
-      console.error('Failed to fetch variants:', error)
       setVariants([])
     }
   }
 
-  const fetchStocks = async () => {
+  const fetchFormVariants = async (productId) => {
     try {
-      setLoading(true)
-      const params = {}
-      if (filterProduct) params.product_id = filterProduct
-      if (filterVariant) params.variant_id = filterVariant
-      if (filterStatus === 'available') params.is_sold = false
-      if (filterStatus === 'sold') params.is_sold = true
-      if (searchQuery) params.search = searchQuery
-
-      const [response] = await Promise.all([
-        stockService.getStocks(params),
-        new Promise(resolve => setTimeout(resolve, 300))
-      ])
-
-      if (response.data) {
-        setStocks(response.data)
-        setPagination({
-          page: response.current_page || 1,
-          total: response.total || response.data.length,
-          per_page: response.per_page || 20
-        })
-      } else if (Array.isArray(response)) {
-        setStocks(response)
-      }
+      const response = await stockService.getProductVariants(productId)
+      setFormVariants(response.data || response || [])
     } catch (error) {
-      showToast('Gagal memuat stock', 'error')
+      setFormVariants([])
+    }
+  }
+
+  const fetchStocksForProduct = async (productId, variantId = '') => {
+    try {
+      setStockLoading(true)
+      const params = { product_id: productId, is_sold: false }
+      if (variantId) params.variant_id = variantId
+      
+      const response = await stockService.getStocks(params)
+      setStocks(response.data || response || [])
+      setHastebinLink('') // Reset hastebin link when changing selection
+    } catch (error) {
+      setStocks([])
     } finally {
-      setLoading(false)
+      setStockLoading(false)
     }
   }
 
@@ -185,21 +117,7 @@ export default function Stocks() {
     }
   }
 
-  const handleSearch = (e) => {
-    e.preventDefault()
-    fetchStocks()
-  }
-
-  const handleFilter = () => {
-    fetchStocks()
-  }
-
-  const openAddModal = () => {
-    setForm({ product_id: '', variant_id: '', data: '' })
-    setShowModal(true)
-  }
-
-  const handleSubmit = async (e) => {
+  const handleAddStock = async (e) => {
     e.preventDefault()
     if (!form.product_id || !form.data.trim()) {
       showToast('Pilih produk dan isi data stock', 'error')
@@ -210,9 +128,16 @@ export default function Stocks() {
       setSaving(true)
       await stockService.addStock(form)
       showToast('Stock berhasil ditambahkan!', 'success')
-      setShowModal(false)
-      fetchStocks()
+      setShowAddModal(false)
+      setForm({ product_id: '', variant_id: '', data: '' })
+      setFormVariants([])
+      
+      // Refresh if same product
+      if (form.product_id === selectedProduct) {
+        fetchStocksForProduct(selectedProduct, selectedVariant)
+      }
       fetchStats()
+      fetchProducts() // Refresh product counts
     } catch (error) {
       showToast(error.response?.data?.message || 'Gagal menambah stock', 'error')
     } finally {
@@ -225,11 +150,68 @@ export default function Stocks() {
       await stockService.deleteStock(id)
       showToast('Stock berhasil dihapus', 'success')
       setDeleteConfirm(null)
-      fetchStocks()
+      fetchStocksForProduct(selectedProduct, selectedVariant)
       fetchStats()
+      fetchProducts()
     } catch (error) {
       showToast('Gagal menghapus stock', 'error')
     }
+  }
+
+  // Generate Hastebin link for current stocks
+  const generateHastebinLink = async () => {
+    if (stocks.length === 0) {
+      showToast('Tidak ada stock untuk di-export', 'error')
+      return
+    }
+
+    try {
+      setHastebinLoading(true)
+      
+      // Get product name
+      const product = products.find(p => p.id == selectedProduct)
+      const variant = variants.find(v => v.id == selectedVariant)
+      
+      let text = '═══════════════════════════════════════\n'
+      text += `   📦 STOCK: ${product?.name || 'Unknown'}`
+      if (variant) text += ` - ${variant.name}`
+      text += '\n═══════════════════════════════════════\n\n'
+      
+      stocks.forEach((stock, idx) => {
+        text += `${idx + 1}. ${stock.data}\n`
+      })
+      
+      text += '\n═══════════════════════════════════════\n'
+      text += `📊 Total: ${stocks.length} akun\n`
+      text += `⏰ Generated: ${new Date().toLocaleString('id-ID')}\n`
+      text += '═══════════════════════════════════════'
+
+      // Post to hastebin
+      const response = await fetch(`${HASTEBIN_URL}/documents`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: text
+      })
+      
+      const data = await response.json()
+      
+      if (data.key) {
+        const link = `${HASTEBIN_URL}/${data.key}`
+        setHastebinLink(link)
+        showToast('Link Hastebin berhasil dibuat!', 'success')
+      } else {
+        throw new Error('No key returned')
+      }
+    } catch (error) {
+      showToast('Gagal membuat link Hastebin', 'error')
+    } finally {
+      setHastebinLoading(false)
+    }
+  }
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text)
+    showToast('Disalin ke clipboard!', 'success')
   }
 
   const showToast = (message, type) => {
@@ -245,373 +227,162 @@ export default function Stocks() {
     }).format(price)
   }
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString('id-ID', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
-
-  // Group stocks by product > variant
-  const groupedStocks = stocks.reduce((acc, stock) => {
-    const productName = stock.product?.name || 'Unknown'
-    const variantName = stock.variant?.name || 'No Variant'
-    
-    if (!acc[productName]) {
-      acc[productName] = {}
-    }
-    if (!acc[productName][variantName]) {
-      acc[productName][variantName] = []
-    }
-    acc[productName][variantName].push(stock)
-    return acc
-  }, {})
-
-  const toggleProduct = (productName) => {
-    setExpandedProducts(prev => ({
-      ...prev,
-      [productName]: !prev[productName]
-    }))
-  }
-
   return (
-    <div className="p-6">
+    <div className="p-4 md:p-6 max-w-4xl mx-auto">
       {/* Toast */}
-      {toast && (
-        <NeoToast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
+      {toast && <NeoToast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold">Kelola Stok</h1>
-          <p className="text-gray-600">Kelola stok produk untuk bot Telegram</p>
+          <h1 className="text-2xl font-bold">📦 Kelola Stok</h1>
+          <p className="text-gray-500 text-sm">Pilih produk untuk melihat stok</p>
         </div>
         <button
-          onClick={openAddModal}
-          className="neo-btn-primary flex items-center gap-2"
+          onClick={() => setShowAddModal(true)}
+          className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 flex items-center gap-2 text-sm"
         >
-          <IconPlus className="w-5 h-5" />
-          Tambah Stok
+          ➕ Tambah
         </button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="neo-card-flat p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-purple-100 rounded-lg border-2 border-black">
-              <IconPackage className="w-6 h-6 text-purple-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">Total Stok</p>
-              <p className="text-2xl font-bold">{stats.total}</p>
-            </div>
-          </div>
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
+          <p className="text-2xl font-bold">{stats.total}</p>
+          <p className="text-xs text-gray-500">Total</p>
         </div>
-        <div className="neo-card-flat p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-green-100 rounded-lg border-2 border-black">
-              <IconPackage className="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">Tersedia</p>
-              <p className="text-2xl font-bold text-green-600">{stats.available}</p>
-            </div>
-          </div>
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+          <p className="text-2xl font-bold text-green-600">{stats.available}</p>
+          <p className="text-xs text-gray-500">Tersedia</p>
         </div>
-        <div className="neo-card-flat p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-orange-100 rounded-lg border-2 border-black">
-              <IconPackage className="w-6 h-6 text-orange-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">Terjual</p>
-              <p className="text-2xl font-bold text-orange-600">{stats.sold}</p>
-            </div>
-          </div>
+        <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-center">
+          <p className="text-2xl font-bold text-orange-600">{stats.sold}</p>
+          <p className="text-xs text-gray-500">Terjual</p>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="neo-card-flat p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {/* Product Filter */}
-          <select
-            value={filterProduct}
-            onChange={(e) => setFilterProduct(e.target.value)}
-            className="neo-select"
-          >
-            <option value="">Semua Produk</option>
-            {products.map(p => (
-              <option key={p.id} value={p.id}>{p.name}</option>
-            ))}
-          </select>
-
-          {/* Variant Filter */}
-          <select
-            value={filterVariant}
-            onChange={(e) => setFilterVariant(e.target.value)}
-            className="neo-select"
-            disabled={!filterProduct}
-          >
-            <option value="">Semua Variant</option>
-            {variants.map(v => (
-              <option key={v.id} value={v.id}>{v.name} - {formatPrice(v.price)}</option>
-            ))}
-          </select>
-
-          {/* Status Filter */}
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="neo-select"
-          >
-            <option value="">Semua Status</option>
-            <option value="available">Tersedia</option>
-            <option value="sold">Terjual</option>
-          </select>
-
-          {/* Search */}
-          <form onSubmit={handleSearch} className="flex gap-2">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cari data stok..."
-              className="neo-input flex-1"
-            />
-          </form>
-
-          {/* Filter Button */}
-          <button
-            onClick={handleFilter}
-            className="neo-btn-secondary flex items-center justify-center gap-2"
-          >
-            <IconSearch className="w-4 h-4" />
-            Filter
-          </button>
-        </div>
-
-        {/* View Mode Toggle */}
-        <div className="flex gap-2 mt-4 md:mt-0">
-          <button
-            onClick={() => setViewMode('grouped')}
-            className={`px-3 py-1 rounded-lg text-sm font-medium transition ${viewMode === 'grouped' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-          >
-            📦 Grouped
-          </button>
-          <button
-            onClick={() => setViewMode('table')}
-            className={`px-3 py-1 rounded-lg text-sm font-medium transition ${viewMode === 'table' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-          >
-            📋 Table
-          </button>
-        </div>
-      </div>
-
-      {/* Grouped View */}
-      {viewMode === 'grouped' && !loading && (
-        <div className="space-y-4 mb-6">
-          {Object.keys(groupedStocks).length === 0 ? (
-            <div className="neo-card-flat p-8 text-center">
-              <IconPackage className="w-12 h-12 mx-auto mb-2 opacity-50" />
-              <p className="text-gray-500">Belum ada stok tersedia</p>
+      {/* Product Selector */}
+      <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-medium mb-1">Produk</label>
+            <select
+              value={selectedProduct}
+              onChange={(e) => {
+                setSelectedProduct(e.target.value)
+                setSelectedVariant('')
+              }}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            >
+              <option value="">-- Pilih Produk --</option>
+              {products.map(p => (
+                <option key={p.id} value={p.id}>
+                  {p.name} ({p.stock_count || 0} stok)
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          {variants.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Variant</label>
+              <select
+                value={selectedVariant}
+                onChange={(e) => setSelectedVariant(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              >
+                <option value="">-- Semua Variant --</option>
+                {variants.map(v => (
+                  <option key={v.id} value={v.id}>
+                    {v.name} - {formatPrice(v.price)} ({v.stock_count || 0})
+                  </option>
+                ))}
+              </select>
             </div>
-          ) : (
-            Object.entries(groupedStocks).map(([productName, variants]) => (
-              <div key={productName} className="neo-card-flat overflow-hidden">
-                {/* Product Header - Clickable */}
-                <button
-                  onClick={() => toggleProduct(productName)}
-                  className="w-full p-4 flex items-center justify-between bg-gradient-to-r from-purple-50 to-white hover:from-purple-100 transition"
-                >
-                  <div className="flex items-center gap-3">
-                    <IconPackage className="w-5 h-5 text-purple-600" />
-                    <span className="font-bold text-lg">{productName}</span>
-                    <span className="neo-badge-purple text-xs">
-                      {Object.values(variants).flat().length} stok
-                    </span>
-                  </div>
-                  <span className={`transform transition ${expandedProducts[productName] ? 'rotate-180' : ''}`}>
-                    ▼
-                  </span>
-                </button>
-
-                {/* Variants & Stocks - Collapsible */}
-                {expandedProducts[productName] && (
-                  <div className="border-t-2 border-black">
-                    {Object.entries(variants).map(([variantName, stockItems]) => (
-                      <div key={variantName} className="border-b border-gray-200 last:border-b-0">
-                        {/* Variant Header */}
-                        <div className="px-4 py-2 bg-gray-50 flex items-center justify-between">
-                          <span className="font-medium text-sm text-gray-700">
-                            {variantName !== 'No Variant' ? `📎 ${variantName}` : '📎 Default'}
-                          </span>
-                          <span className="text-xs text-gray-500">{stockItems.length} item</span>
-                        </div>
-                        
-                        {/* Stock Items - Mobile Cards */}
-                        <div className="divide-y divide-gray-100">
-                          {stockItems.slice(0, 5).map((stock, idx) => (
-                            <div key={stock.id} className="p-3 flex items-center justify-between hover:bg-gray-50">
-                              <div className="flex-1 min-w-0">
-                                <p className="font-mono text-sm truncate" title={stock.data}>
-                                  {stock.data}
-                                </p>
-                                <p className="text-xs text-gray-400 mt-0.5">
-                                  {formatDate(stock.created_at)}
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-2 ml-2">
-                                {stock.is_sold ? (
-                                  <span className="neo-badge-warning text-xs">Terjual</span>
-                                ) : (
-                                  <span className="neo-badge-success text-xs">Tersedia</span>
-                                )}
-                                <button
-                                  onClick={() => setDeleteConfirm(stock)}
-                                  className="p-1.5 text-red-500 hover:bg-red-50 rounded transition"
-                                >
-                                  <IconTrash className="w-4 h-4" />
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                          {stockItems.length > 5 && (
-                            <div className="p-2 text-center text-sm text-gray-500 bg-gray-50">
-                              + {stockItems.length - 5} lainnya
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))
           )}
         </div>
-      )}
+      </div>
 
-      {/* Table View */}
-      {viewMode === 'table' && (
-        <div className="neo-card-flat overflow-hidden">
-          {/* Desktop Table */}
-          <div className="hidden md:block overflow-x-auto">
-            <table className="neo-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Produk</th>
-                  <th>Variant</th>
-                  <th>Detail Stok</th>
-                  <th>Status</th>
-                  <th>Tanggal</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  [...Array(5)].map((_, i) => (
-                    <TableRowSkeleton key={i} columns={7} />
-                  ))
-                ) : stocks.length === 0 ? (
-                  <tr>
-                    <td colSpan="7" className="text-center py-8 text-gray-500">
-                      <IconPackage className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                      <p>Belum ada stok</p>
-                    </td>
-                  </tr>
-                ) : (
-                  stocks.map((stock, idx) => (
-                    <tr key={stock.id}>
-                      <td className="font-mono text-sm">{idx + 1}</td>
-                      <td className="font-medium">{stock.product?.name || '-'}</td>
-                      <td>
-                        {stock.variant ? (
-                          <span className="neo-badge-purple">
-                            {stock.variant.name}
-                          </span>
-                        ) : (
-                          <span className="text-gray-400">-</span>
-                        )}
-                      </td>
-                      <td className="font-mono text-sm max-w-xs truncate" title={stock.data}>
-                        {stock.data}
-                      </td>
-                      <td>
-                        {stock.is_sold ? (
-                          <span className="neo-badge-warning">Terjual</span>
-                        ) : (
-                          <span className="neo-badge-success">Tersedia</span>
-                        )}
-                      </td>
-                      <td className="text-sm text-gray-600">
-                        {formatDate(stock.created_at)}
-                      </td>
-                      <td>
-                        <button
-                          onClick={() => setDeleteConfirm(stock)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                          title="Hapus"
-                        >
-                          <IconTrash className="w-4 h-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+      {/* Stock List */}
+      {selectedProduct && (
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+          {/* Header */}
+          <div className="bg-gray-50 border-b border-gray-200 p-3 flex justify-between items-center">
+            <span className="font-medium text-sm">
+              📋 {stocks.length} stok tersedia
+            </span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => fetchStocksForProduct(selectedProduct, selectedVariant)}
+                className="text-gray-500 hover:text-black px-2 py-1 text-sm"
+                title="Refresh"
+              >
+                🔄
+              </button>
+              <button
+                onClick={generateHastebinLink}
+                disabled={hastebinLoading || stocks.length === 0}
+                className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 disabled:opacity-50"
+              >
+                {hastebinLoading ? '...' : '🔗 Hastebin'}
+              </button>
+            </div>
           </div>
 
-          {/* Mobile Cards */}
-          <div className="md:hidden divide-y divide-gray-200">
-            {loading ? (
-              <div className="p-4 text-center text-gray-500">Loading...</div>
+          {/* Hastebin Link */}
+          {hastebinLink && (
+            <div className="bg-blue-50 border-b border-blue-100 p-3 flex items-center justify-between">
+              <a 
+                href={hastebinLink} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline text-sm truncate flex-1"
+              >
+                🔗 {hastebinLink}
+              </a>
+              <button
+                onClick={() => copyToClipboard(hastebinLink)}
+                className="ml-2 text-blue-600 hover:text-blue-800 text-sm"
+              >
+                📋 Copy
+              </button>
+            </div>
+          )}
+
+          {/* Stock Items */}
+          <div className="divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
+            {stockLoading ? (
+              <div className="p-8 text-center text-gray-400">Loading...</div>
             ) : stocks.length === 0 ? (
-              <div className="p-8 text-center">
-                <IconPackage className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                <p className="text-gray-500">Belum ada stok</p>
+              <div className="p-8 text-center text-gray-400">
+                📦
+                <p className="mt-2">Tidak ada stok</p>
               </div>
             ) : (
               stocks.map((stock, idx) => (
-                <div key={stock.id} className="p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <p className="font-medium">{stock.product?.name || '-'}</p>
-                      {stock.variant && (
-                        <span className="neo-badge-purple text-xs mt-1 inline-block">
-                          {stock.variant.name}
-                        </span>
-                      )}
-                    </div>
+                <div key={stock.id} className="p-3 hover:bg-gray-50 flex items-center justify-between group">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      {stock.is_sold ? (
-                        <span className="neo-badge-warning text-xs">Terjual</span>
-                      ) : (
-                        <span className="neo-badge-success text-xs">Tersedia</span>
-                      )}
+                      <span className="text-gray-400 text-xs w-6">{idx + 1}.</span>
+                      <code className="text-sm truncate flex-1">{stock.data}</code>
                       <button
-                        onClick={() => setDeleteConfirm(stock)}
-                        className="p-1.5 text-red-500 hover:bg-red-50 rounded"
+                        onClick={() => copyToClipboard(stock.data)}
+                        className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600 text-xs"
                       >
-                        <IconTrash className="w-4 h-4" />
+                        📋
                       </button>
                     </div>
+                    {stock.variant && (
+                      <span className="text-xs text-purple-600 ml-8">{stock.variant.name}</span>
+                    )}
                   </div>
-                  <p className="font-mono text-sm text-gray-600 truncate" title={stock.data}>
-                    {stock.data}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">{formatDate(stock.created_at)}</p>
+                  <button
+                    onClick={() => setDeleteConfirm(stock)}
+                    className="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 text-sm ml-2"
+                  >
+                    🗑️
+                  </button>
                 </div>
               ))
             )}
@@ -619,86 +390,88 @@ export default function Stocks() {
         </div>
       )}
 
-      {/* Add Stock Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="neo-card-flat w-full max-w-lg p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Tambah Stok</h2>
-              <button onClick={() => setShowModal(false)} className="p-2 hover:bg-gray-100 rounded-lg">
-                <IconX className="w-5 h-5" />
-              </button>
-            </div>
+      {/* Empty State */}
+      {!selectedProduct && !loading && (
+        <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-12 text-center">
+          <p className="text-4xl mb-2">📦</p>
+          <p className="text-gray-500">Pilih produk untuk melihat stok</p>
+        </div>
+      )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Product Select */}
+      {/* Add Stock Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-md p-5">
+            <h2 className="text-lg font-bold mb-4">➕ Tambah Stok</h2>
+
+            <form onSubmit={handleAddStock} className="space-y-4">
               <div>
-                <label className="block text-sm font-bold mb-2">Pilih Produk *</label>
+                <label className="block text-sm font-medium mb-1">Produk *</label>
                 <select
                   value={form.product_id}
                   onChange={(e) => {
                     setForm({ ...form, product_id: e.target.value, variant_id: '' })
-                    if (e.target.value) fetchVariantsForProduct(e.target.value)
+                    if (e.target.value) fetchFormVariants(e.target.value)
+                    else setFormVariants([])
                   }}
-                  className="neo-select"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
                   required
                 >
                   <option value="">-- Pilih Produk --</option>
                   {products.map(p => (
-                    <option key={p.id} value={p.id}>{p.name} ({p.product_code})</option>
+                    <option key={p.id} value={p.id}>{p.name}</option>
                   ))}
                 </select>
               </div>
 
-              {/* Variant Select */}
-              <div>
-                <label className="block text-sm font-bold mb-2">Pilih Variant</label>
-                <select
-                  value={form.variant_id}
-                  onChange={(e) => setForm({ ...form, variant_id: e.target.value })}
-                  className="neo-select"
-                  disabled={!form.product_id || variants.length === 0}
-                >
-                  <option value="">-- Tanpa Variant --</option>
-                  {variants.map(v => (
-                    <option key={v.id} value={v.id}>{v.name} - {formatPrice(v.price)}</option>
-                  ))}
-                </select>
-                {form.product_id && variants.length === 0 && (
-                  <p className="text-xs text-gray-500 mt-1">Produk ini tidak memiliki variant</p>
-                )}
-              </div>
+              {form.product_id && formVariants.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium mb-1">Variant</label>
+                  <select
+                    value={form.variant_id}
+                    onChange={(e) => setForm({ ...form, variant_id: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                  >
+                    <option value="">-- Tanpa Variant --</option>
+                    {formVariants.map(v => (
+                      <option key={v.id} value={v.id}>{v.name} - {formatPrice(v.price)}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
-              {/* Stock Data */}
               <div>
-                <label className="block text-sm font-bold mb-2">Detail Stok *</label>
+                <label className="block text-sm font-medium mb-1">Data Stok *</label>
                 <textarea
                   value={form.data}
                   onChange={(e) => setForm({ ...form, data: e.target.value })}
                   placeholder="email@example.com|password123&#10;email2@example.com|password456"
-                  className="neo-input h-32 resize-none font-mono text-sm"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 h-32 font-mono text-sm resize-none"
                   required
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  Format: email|password (satu per baris untuk bulk)
+                <p className="text-xs text-gray-400 mt-1">
+                  Satu akun per baris. Format: email|password
                 </p>
               </div>
 
-              {/* Submit */}
               <div className="flex gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => setShowModal(false)}
-                  className="neo-btn-secondary flex-1"
+                  onClick={() => {
+                    setShowAddModal(false)
+                    setForm({ product_id: '', variant_id: '', data: '' })
+                    setFormVariants([])
+                  }}
+                  className="flex-1 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 text-sm"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="neo-btn-primary flex-1"
+                  className="flex-1 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 disabled:opacity-50 text-sm"
                 >
-                  {saving ? 'Menyimpan...' : 'Simpan Stok'}
+                  {saving ? 'Menyimpan...' : 'Simpan'}
                 </button>
               </div>
             </form>
@@ -706,25 +479,23 @@ export default function Stocks() {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Confirmation */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="neo-card-flat w-full max-w-md p-6 text-center">
-            <IconTrash className="w-12 h-12 mx-auto mb-4 text-red-500" />
-            <h3 className="text-xl font-bold mb-2">Hapus Stok?</h3>
-            <p className="text-gray-600 mb-4 font-mono text-sm truncate">
-              {deleteConfirm.data}
-            </p>
+          <div className="bg-white rounded-lg w-full max-w-sm p-5 text-center">
+            <p className="text-4xl mb-3">🗑️</p>
+            <h3 className="font-bold mb-2">Hapus stok ini?</h3>
+            <code className="text-sm text-gray-600 block truncate mb-4">{deleteConfirm.data}</code>
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="neo-btn-secondary flex-1"
+                className="flex-1 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 text-sm"
               >
                 Batal
               </button>
               <button
                 onClick={() => handleDelete(deleteConfirm.id)}
-                className="neo-btn-danger flex-1"
+                className="flex-1 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 text-sm"
               >
                 Hapus
               </button>
