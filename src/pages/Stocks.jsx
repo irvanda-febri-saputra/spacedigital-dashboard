@@ -77,10 +77,14 @@ export default function Stocks() {
   const [toast, setToast] = useState(null)
   const [stats, setStats] = useState({ total: 0, available: 0, sold: 0 })
 
-  // Filters
+  // Filters - Default to show only available stocks
   const [filterProduct, setFilterProduct] = useState('')
   const [filterVariant, setFilterVariant] = useState('')
-  const [filterStatus, setFilterStatus] = useState('') // '', 'available', 'sold'
+  const [filterStatus, setFilterStatus] = useState('available') // Default: show only available
+
+  // View Mode
+  const [viewMode, setViewMode] = useState('grouped') // 'grouped' or 'table'
+  const [expandedProducts, setExpandedProducts] = useState({})
 
   // Pagination
   const [pagination, setPagination] = useState({ page: 1, total: 0, per_page: 20 })
@@ -251,6 +255,28 @@ export default function Stocks() {
     })
   }
 
+  // Group stocks by product > variant
+  const groupedStocks = stocks.reduce((acc, stock) => {
+    const productName = stock.product?.name || 'Unknown'
+    const variantName = stock.variant?.name || 'No Variant'
+    
+    if (!acc[productName]) {
+      acc[productName] = {}
+    }
+    if (!acc[productName][variantName]) {
+      acc[productName][variantName] = []
+    }
+    acc[productName][variantName].push(stock)
+    return acc
+  }, {})
+
+  const toggleProduct = (productName) => {
+    setExpandedProducts(prev => ({
+      ...prev,
+      [productName]: !prev[productName]
+    }))
+  }
+
   return (
     <div className="p-6">
       {/* Toast */}
@@ -373,78 +399,225 @@ export default function Stocks() {
             Filter
           </button>
         </div>
+
+        {/* View Mode Toggle */}
+        <div className="flex gap-2 mt-4 md:mt-0">
+          <button
+            onClick={() => setViewMode('grouped')}
+            className={`px-3 py-1 rounded-lg text-sm font-medium transition ${viewMode === 'grouped' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          >
+            📦 Grouped
+          </button>
+          <button
+            onClick={() => setViewMode('table')}
+            className={`px-3 py-1 rounded-lg text-sm font-medium transition ${viewMode === 'table' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          >
+            📋 Table
+          </button>
+        </div>
       </div>
 
-      {/* Table */}
-      <div className="neo-card-flat overflow-hidden">
-        <table className="neo-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Produk</th>
-              <th>Variant</th>
-              <th>Detail Stok</th>
-              <th>Status</th>
-              <th>Tanggal</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
+      {/* Grouped View */}
+      {viewMode === 'grouped' && !loading && (
+        <div className="space-y-4 mb-6">
+          {Object.keys(groupedStocks).length === 0 ? (
+            <div className="neo-card-flat p-8 text-center">
+              <IconPackage className="w-12 h-12 mx-auto mb-2 opacity-50" />
+              <p className="text-gray-500">Belum ada stok tersedia</p>
+            </div>
+          ) : (
+            Object.entries(groupedStocks).map(([productName, variants]) => (
+              <div key={productName} className="neo-card-flat overflow-hidden">
+                {/* Product Header - Clickable */}
+                <button
+                  onClick={() => toggleProduct(productName)}
+                  className="w-full p-4 flex items-center justify-between bg-gradient-to-r from-purple-50 to-white hover:from-purple-100 transition"
+                >
+                  <div className="flex items-center gap-3">
+                    <IconPackage className="w-5 h-5 text-purple-600" />
+                    <span className="font-bold text-lg">{productName}</span>
+                    <span className="neo-badge-purple text-xs">
+                      {Object.values(variants).flat().length} stok
+                    </span>
+                  </div>
+                  <span className={`transform transition ${expandedProducts[productName] ? 'rotate-180' : ''}`}>
+                    ▼
+                  </span>
+                </button>
+
+                {/* Variants & Stocks - Collapsible */}
+                {expandedProducts[productName] && (
+                  <div className="border-t-2 border-black">
+                    {Object.entries(variants).map(([variantName, stockItems]) => (
+                      <div key={variantName} className="border-b border-gray-200 last:border-b-0">
+                        {/* Variant Header */}
+                        <div className="px-4 py-2 bg-gray-50 flex items-center justify-between">
+                          <span className="font-medium text-sm text-gray-700">
+                            {variantName !== 'No Variant' ? `📎 ${variantName}` : '📎 Default'}
+                          </span>
+                          <span className="text-xs text-gray-500">{stockItems.length} item</span>
+                        </div>
+                        
+                        {/* Stock Items - Mobile Cards */}
+                        <div className="divide-y divide-gray-100">
+                          {stockItems.slice(0, 5).map((stock, idx) => (
+                            <div key={stock.id} className="p-3 flex items-center justify-between hover:bg-gray-50">
+                              <div className="flex-1 min-w-0">
+                                <p className="font-mono text-sm truncate" title={stock.data}>
+                                  {stock.data}
+                                </p>
+                                <p className="text-xs text-gray-400 mt-0.5">
+                                  {formatDate(stock.created_at)}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-2 ml-2">
+                                {stock.is_sold ? (
+                                  <span className="neo-badge-warning text-xs">Terjual</span>
+                                ) : (
+                                  <span className="neo-badge-success text-xs">Tersedia</span>
+                                )}
+                                <button
+                                  onClick={() => setDeleteConfirm(stock)}
+                                  className="p-1.5 text-red-500 hover:bg-red-50 rounded transition"
+                                >
+                                  <IconTrash className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                          {stockItems.length > 5 && (
+                            <div className="p-2 text-center text-sm text-gray-500 bg-gray-50">
+                              + {stockItems.length - 5} lainnya
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* Table View */}
+      {viewMode === 'table' && (
+        <div className="neo-card-flat overflow-hidden">
+          {/* Desktop Table */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="neo-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Produk</th>
+                  <th>Variant</th>
+                  <th>Detail Stok</th>
+                  <th>Status</th>
+                  <th>Tanggal</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  [...Array(5)].map((_, i) => (
+                    <TableRowSkeleton key={i} columns={7} />
+                  ))
+                ) : stocks.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-8 text-gray-500">
+                      <IconPackage className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                      <p>Belum ada stok</p>
+                    </td>
+                  </tr>
+                ) : (
+                  stocks.map((stock, idx) => (
+                    <tr key={stock.id}>
+                      <td className="font-mono text-sm">{idx + 1}</td>
+                      <td className="font-medium">{stock.product?.name || '-'}</td>
+                      <td>
+                        {stock.variant ? (
+                          <span className="neo-badge-purple">
+                            {stock.variant.name}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
+                      </td>
+                      <td className="font-mono text-sm max-w-xs truncate" title={stock.data}>
+                        {stock.data}
+                      </td>
+                      <td>
+                        {stock.is_sold ? (
+                          <span className="neo-badge-warning">Terjual</span>
+                        ) : (
+                          <span className="neo-badge-success">Tersedia</span>
+                        )}
+                      </td>
+                      <td className="text-sm text-gray-600">
+                        {formatDate(stock.created_at)}
+                      </td>
+                      <td>
+                        <button
+                          onClick={() => setDeleteConfirm(stock)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                          title="Hapus"
+                        >
+                          <IconTrash className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden divide-y divide-gray-200">
             {loading ? (
-              [...Array(5)].map((_, i) => (
-                <TableRowSkeleton key={i} columns={7} />
-              ))
+              <div className="p-4 text-center text-gray-500">Loading...</div>
             ) : stocks.length === 0 ? (
-              <tr>
-                <td colSpan="7" className="text-center py-8 text-gray-500">
-                  <IconPackage className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                  <p>Belum ada stok</p>
-                </td>
-              </tr>
+              <div className="p-8 text-center">
+                <IconPackage className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                <p className="text-gray-500">Belum ada stok</p>
+              </div>
             ) : (
               stocks.map((stock, idx) => (
-                <tr key={stock.id}>
-                  <td className="font-mono text-sm">{idx + 1}</td>
-                  <td className="font-medium">{stock.product?.name || '-'}</td>
-                  <td>
-                    {stock.variant ? (
-                      <span className="neo-badge-purple">
-                        {stock.variant.name}
-                      </span>
-                    ) : (
-                      <span className="text-gray-400">-</span>
-                    )}
-                  </td>
-                  <td className="font-mono text-sm max-w-xs truncate" title={stock.data}>
-                    {stock.data}
-                  </td>
-                  <td>
-                    {stock.is_sold ? (
-                      <span className="neo-badge-warning">Terjual</span>
-                    ) : (
-                      <span className="neo-badge-success">Tersedia</span>
-                    )}
-                  </td>
-                  <td className="text-sm text-gray-600">
-                    {formatDate(stock.created_at)}
-                  </td>
-                  <td>
-                    <div className="flex gap-2">
+                <div key={stock.id} className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <p className="font-medium">{stock.product?.name || '-'}</p>
+                      {stock.variant && (
+                        <span className="neo-badge-purple text-xs mt-1 inline-block">
+                          {stock.variant.name}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {stock.is_sold ? (
+                        <span className="neo-badge-warning text-xs">Terjual</span>
+                      ) : (
+                        <span className="neo-badge-success text-xs">Tersedia</span>
+                      )}
                       <button
                         onClick={() => setDeleteConfirm(stock)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                        title="Hapus"
+                        className="p-1.5 text-red-500 hover:bg-red-50 rounded"
                       >
                         <IconTrash className="w-4 h-4" />
                       </button>
                     </div>
-                  </td>
-                </tr>
+                  </div>
+                  <p className="font-mono text-sm text-gray-600 truncate" title={stock.data}>
+                    {stock.data}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">{formatDate(stock.created_at)}</p>
+                </div>
               ))
             )}
-          </tbody>
-        </table>
-      </div>
+          </div>
+        </div>
+      )}
 
       {/* Add Stock Modal */}
       {showModal && (
