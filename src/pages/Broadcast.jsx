@@ -8,11 +8,34 @@ export default function Broadcast() {
   const [sending, setSending] = useState(false)
   const [history, setHistory] = useState([])
   const [loadingHistory, setLoadingHistory] = useState(true)
+  const [bots, setBots] = useState([])
+  const [selectedBotId, setSelectedBotId] = useState('')
+  const [loadingBots, setLoadingBots] = useState(true)
 
-  // Fetch broadcast history on mount
+  // Fetch bots and history on mount
   useEffect(() => {
+    fetchBots()
     fetchHistory()
   }, [])
+
+  const fetchBots = async () => {
+    setLoadingBots(true)
+    try {
+      const res = await api.get('/dashboard/bots')
+      if (res.data.success || res.data.data) {
+        const botList = res.data.data || res.data || []
+        setBots(botList)
+        // Auto-select first bot
+        if (botList.length > 0 && !selectedBotId) {
+          setSelectedBotId(botList[0].id)
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch bots:', err)
+    } finally {
+      setLoadingBots(false)
+    }
+  }
 
   const fetchHistory = async () => {
     setLoadingHistory(true)
@@ -34,9 +57,15 @@ export default function Broadcast() {
       return
     }
 
+    if (!selectedBotId) {
+      alert('Pilih bot terlebih dahulu!')
+      return
+    }
+
     setSending(true)
     try {
       const res = await api.post('/dashboard/broadcast', {
+        bot_id: selectedBotId,
         message: message.trim(),
         image_url: imageUrl.trim() || null,
         format: format
@@ -48,11 +77,11 @@ export default function Broadcast() {
         setImageUrl('')
         fetchHistory()
       } else {
-        alert('Gagal mengirim broadcast: ' + (res.data.message || 'Unknown error'))
+        alert('Gagal mengirim broadcast: ' + (res.data.message || res.data.error || 'Unknown error'))
       }
     } catch (err) {
       console.error('Broadcast error:', err)
-      alert('Error: ' + (err.response?.data?.message || err.message))
+      alert('Error: ' + (err.response?.data?.error || err.response?.data?.message || err.message))
     } finally {
       setSending(false)
     }
@@ -66,6 +95,29 @@ export default function Broadcast() {
           <h1 className="text-2xl font-black text-gray-900">Broadcast</h1>
           <p className="text-gray-600">Kirim pesan ke semua user bot Telegram</p>
         </div>
+      </div>
+
+      {/* Bot Selector */}
+      <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-4">
+        <label className="block text-sm font-bold mb-2">Pilih Bot *</label>
+        {loadingBots ? (
+          <div className="text-gray-500">Memuat bot...</div>
+        ) : bots.length === 0 ? (
+          <div className="text-red-500">Tidak ada bot tersedia</div>
+        ) : (
+          <select
+            value={selectedBotId}
+            onChange={(e) => setSelectedBotId(e.target.value)}
+            className="w-full border-4 border-black p-3 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white"
+          >
+            <option value="">-- Pilih Bot --</option>
+            {bots.map((bot) => (
+              <option key={bot.id} value={bot.id}>
+                {bot.name} {bot.username ? `(@${bot.username})` : ''}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* Send Broadcast Form */}
