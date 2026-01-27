@@ -66,6 +66,7 @@ export default function Sidebar({ isOpen, onClose, collapsed, onCollapsedChange 
         { name: 'Bot Settings', icon: IconBot, href: '/bots', active: currentPath?.startsWith('/bots') },
         { name: 'Kelola Produk', icon: IconPackage, href: '/bot-products', active: currentPath?.startsWith('/bot-products') },
         { name: 'Kelola Stok', icon: IconPackage, href: '/stocks', active: currentPath === '/stocks' },
+        { name: 'Broadcast', icon: IconSignal, href: '/broadcast', active: currentPath === '/broadcast' },
         { name: 'Transactions', icon: IconTransaction, href: '/transactions', active: currentPath === '/transactions' },
         { name: 'Create Transaction', icon: IconPlus, href: '/transactions/create', active: currentPath === '/transactions/create' },
         { name: 'Atlantic Withdraw', icon: IconWithdraw, href: '/atlantic-withdraw', active: currentPath?.startsWith('/atlantic-withdraw') },
