@@ -26,7 +26,6 @@ import AdminUsers from './pages/AdminUsers'
 import AdminBots from './pages/AdminBots'
 import Stocks from './pages/Stocks'
 import ProductCreate from './pages/ProductCreate'
-import Broadcast from './pages/Broadcast'
 
 export default function App() {
   return (
@@ -60,7 +59,6 @@ export default function App() {
           <Route path="bot-products" element={<BotProducts />} />
           <Route path="bot-products/create" element={<ProductCreate />} />
           <Route path="stocks" element={<Stocks />} />
-          <Route path="broadcast" element={<Broadcast />} />
           <Route path="order-kuota" element={<OrderKuota />} />
           <Route path="payment-gateways" element={<PaymentGateways />} />
           <Route path="payment-gateways/:id/configure" element={<PaymentGatewaysConfigure />} />

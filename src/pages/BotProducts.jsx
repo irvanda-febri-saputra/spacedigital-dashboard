@@ -485,6 +485,12 @@ export default function BotProducts() {
           <p className="text-gray-600 mt-1">Kelola produk untuk bot Telegram</p>
         </div>
         <div className="flex gap-2">
+          <button
+            onClick={openBroadcastModal}
+            className="neo-btn-secondary inline-flex items-center gap-2"
+          >
+            📢 Broadcast
+          </button>
           <Link
             to="/bot-products/create"
             className="neo-btn-primary inline-flex items-center gap-2"
