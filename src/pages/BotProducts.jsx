@@ -189,12 +189,14 @@ export default function BotProducts() {
       product_code: product.product_code || '',
       description: product.description || '',
       category: product.category || '',
+      terms: product.terms || '',
       is_active: product.is_active ? 1 : 0
     } : {
       name: '',
       product_code: '',
       description: '',
       category: '',
+      terms: '',
       is_active: 1
     })
     setModalType('product')
@@ -701,6 +703,18 @@ export default function BotProducts() {
                   className="neo-input"
                   placeholder="Deskripsi produk..."
                 />
+              </div>
+
+              <div>
+                <label className="block font-bold mb-2">Syarat & Ketentuan (SNK)</label>
+                <textarea
+                  value={productForm.terms}
+                  onChange={(e) => setProductForm({ ...productForm, terms: e.target.value })}
+                  rows={3}
+                  className="neo-input"
+                  placeholder="Contoh: Garansi 7 hari. Tidak untuk sharing. Dilarang mengubah password tanpa izin."
+                />
+                <p className="text-xs text-gray-500 mt-1">Opsional. Akan ditampilkan ke pembeli saat pembelian.</p>
               </div>
 
               <div className="flex items-center gap-3">
