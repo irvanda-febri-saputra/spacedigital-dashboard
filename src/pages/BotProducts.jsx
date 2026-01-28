@@ -355,9 +355,9 @@ export default function BotProducts() {
     }
   }
 
-  const handleDeleteVariant = async (variantId) => {
+  const handleDeleteVariant = async (productId, variantId) => {
     try {
-      await botProductService.deleteVariant(selectedProduct.id, variantId)
+      await botProductService.deleteVariant(productId, variantId)
       setToast({ message: 'Varian berhasil dihapus!', type: 'success' })
       fetchProducts()
     } catch (err) {
@@ -842,25 +842,67 @@ export default function BotProducts() {
 
               {/* Variants */}
               <div className="border-t pt-4">
-                <h3 className="font-bold mb-3">Variant Produk ({Array.isArray(detailProduct.variants) ? detailProduct.variants.length : 0})</h3>
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-bold">Variant Produk ({Array.isArray(detailProduct.variants) ? detailProduct.variants.length : 0})</h3>
+                  <button
+                    onClick={() => {
+                      setShowModal(false)
+                      openVariantModal(detailProduct)
+                    }}
+                    className="neo-btn-primary neo-btn-sm"
+                  >
+                    <IconPlus className="w-4 h-4 inline mr-1" />
+                    Tambah
+                  </button>
+                </div>
                 {Array.isArray(detailProduct.variants) && detailProduct.variants.length > 0 ? (
                   <div className="space-y-2">
                     {detailProduct.variants.map(v => (
-                      <div key={v.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border">
-                        <div>
-                          <span className="font-mono text-xs bg-gray-200 px-2 py-0.5 rounded mr-2">{v.variant_code}</span>
-                          <span className="font-medium">{v.name}</span>
+                      <div key={v.id} className="p-3 bg-gray-50 rounded-lg border">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <span className="font-mono text-xs bg-gray-200 px-2 py-0.5 rounded mr-2">{v.variant_code}</span>
+                            <span className="font-medium">{v.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-primary-600">Rp {(v.price || 0).toLocaleString('id-ID')}</span>
+                            <span className="text-sm text-gray-400">(Stok: {v.stock_count || 0})</span>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <span className="font-bold text-primary-600">Rp {(v.price || 0).toLocaleString('id-ID')}</span>
-                          <span className="text-sm text-gray-400 ml-2">(Stok: {v.stock_count || 0})</span>
+                        {v.terms && (
+                          <div className="mt-2 text-xs text-gray-500 bg-yellow-50 p-2 rounded">
+                            <strong>SNK:</strong> {v.terms}
+                          </div>
+                        )}
+                        <div className="flex gap-2 mt-2">
+                          <button
+                            onClick={() => {
+                              setShowModal(false)
+                              openVariantModal(detailProduct, v)
+                            }}
+                            className="neo-btn-warning neo-btn-sm text-xs"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => setDeleteConfirm({ type: 'variant', product: detailProduct, variant: v })}
+                            className="neo-btn-danger neo-btn-sm text-xs"
+                          >
+                            Hapus
+                          </button>
+                          <button
+                            onClick={() => openStockModal(detailProduct, v)}
+                            className="neo-btn-secondary neo-btn-sm text-xs"
+                          >
+                            + Stok
+                          </button>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
                   <p className="text-gray-400 text-center py-4">Belum ada variant</p>
-                )}
+                )}}
               </div>
 
               {/* Stats */}
@@ -1190,15 +1232,30 @@ Hubungi admin untuk info lebih lanjut!`}
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white border-2 border-gray-200 rounded-xl shadow-xl w-full max-w-md">
             <div className="border-b border-gray-200 p-4">
-              <h2 className="text-xl font-bold text-gray-900">Hapus Produk</h2>
+              <h2 className="text-xl font-bold text-gray-900">
+                {deleteConfirm.type === 'variant' ? 'Hapus Varian' : 'Hapus Produk'}
+              </h2>
             </div>
             <div className="p-6">
-              <p className="text-gray-700 mb-2">
-                Apakah Anda yakin ingin menghapus produk <strong>{deleteConfirm.name}</strong>?
-              </p>
-              <p className="text-red-500 text-sm mb-6">
-                Semua stock dan varian akan ikut terhapus!
-              </p>
+              {deleteConfirm.type === 'variant' ? (
+                <>
+                  <p className="text-gray-700 mb-2">
+                    Apakah Anda yakin ingin menghapus varian <strong>{deleteConfirm.variant?.name}</strong> dari produk <strong>{deleteConfirm.product?.name}</strong>?
+                  </p>
+                  <p className="text-red-500 text-sm mb-6">
+                    Semua stock varian ini akan ikut terhapus!
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-gray-700 mb-2">
+                    Apakah Anda yakin ingin menghapus produk <strong>{deleteConfirm.name}</strong>?
+                  </p>
+                  <p className="text-red-500 text-sm mb-6">
+                    Semua stock dan varian akan ikut terhapus!
+                  </p>
+                </>
+              )}
               <div className="flex gap-3">
                 <button
                   onClick={() => setDeleteConfirm(null)}
@@ -1207,7 +1264,14 @@ Hubungi admin untuk info lebih lanjut!`}
                   Batal
                 </button>
                 <button
-                  onClick={() => handleDeleteProduct(deleteConfirm)}
+                  onClick={() => {
+                    if (deleteConfirm.type === 'variant') {
+                      handleDeleteVariant(deleteConfirm.product?.id, deleteConfirm.variant?.id)
+                      setDeleteConfirm(null)
+                    } else {
+                      handleDeleteProduct(deleteConfirm)
+                    }
+                  }}
                   className="neo-btn-primary bg-red-500 hover:bg-red-600 flex-1"
                 >
                   Hapus
