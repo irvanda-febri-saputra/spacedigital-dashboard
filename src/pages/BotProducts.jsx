@@ -116,7 +116,8 @@ export default function BotProducts() {
   const [variantForm, setVariantForm] = useState({
     name: '',
     variant_code: '',
-    price: ''
+    price: '',
+    terms: ''
   })
 
   // Edit variant state
@@ -189,14 +190,12 @@ export default function BotProducts() {
       product_code: product.product_code || '',
       description: product.description || '',
       category: product.category || '',
-      terms: product.terms || '',
       is_active: product.is_active ? 1 : 0
     } : {
       name: '',
       product_code: '',
       description: '',
       category: '',
-      terms: '',
       is_active: 1
     })
     setModalType('product')
@@ -302,11 +301,13 @@ export default function BotProducts() {
     setVariantForm(variant ? {
       name: variant.name || '',
       variant_code: variant.variant_code || '',
-      price: variant.price || ''
+      price: variant.price || '',
+      terms: variant.terms || ''
     } : {
       name: '',
       variant_code: '',
-      price: ''
+      price: '',
+      terms: ''
     })
     setModalType('variant')
     setShowModal(true)
@@ -321,7 +322,8 @@ export default function BotProducts() {
       const variantData = {
         name: variantForm.name?.trim(),
         variant_code: variantForm.variant_code?.trim() || variantForm.name?.trim().replace(/\s+/g, '_').toUpperCase(),
-        price: parseInt(variantForm.price) || 0
+        price: parseInt(variantForm.price) || 0,
+        terms: variantForm.terms?.trim() || null
       }
       
       // Validation
@@ -705,18 +707,6 @@ export default function BotProducts() {
                 />
               </div>
 
-              <div>
-                <label className="block font-bold mb-2">Syarat & Ketentuan (SNK)</label>
-                <textarea
-                  value={productForm.terms}
-                  onChange={(e) => setProductForm({ ...productForm, terms: e.target.value })}
-                  rows={3}
-                  className="neo-input"
-                  placeholder="Contoh: Garansi 7 hari. Tidak untuk sharing. Dilarang mengubah password tanpa izin."
-                />
-                <p className="text-xs text-gray-500 mt-1">Opsional. Akan ditampilkan ke pembeli saat pembelian.</p>
-              </div>
-
               <div className="flex items-center gap-3">
                 <input
                   type="checkbox"
@@ -1059,6 +1049,18 @@ export default function BotProducts() {
                   className="neo-input"
                   placeholder="25000"
                 />
+              </div>
+
+              <div>
+                <label className="block font-bold mb-2">Syarat & Ketentuan (SNK)</label>
+                <textarea
+                  value={variantForm.terms}
+                  onChange={(e) => setVariantForm({ ...variantForm, terms: e.target.value })}
+                  rows={3}
+                  className="neo-input"
+                  placeholder="Contoh: Garansi 7 hari. Tidak untuk sharing."
+                />
+                <p className="text-xs text-gray-500 mt-1">Opsional. Ditampilkan ke pembeli saat membeli varian ini.</p>
               </div>
 
               <div className="flex gap-3 pt-4 border-t border-gray-200">
