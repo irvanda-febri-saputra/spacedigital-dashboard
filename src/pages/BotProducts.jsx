@@ -865,7 +865,7 @@ export default function BotProducts() {
                             <span className="font-medium">{v.name}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-primary-600">Rp {(v.price || 0).toLocaleString('id-ID')}</span>
+                            <span className="font-bold text-primary-600">Rp {Math.floor(v.price || 0).toLocaleString('id-ID')}</span>
                             <span className="text-sm text-gray-400">(Stok: {v.stock_count || 0})</span>
                           </div>
                         </div>
@@ -902,7 +902,7 @@ export default function BotProducts() {
                   </div>
                 ) : (
                   <p className="text-gray-400 text-center py-4">Belum ada variant</p>
-                )}}
+                )}
               </div>
 
               {/* Stats */}
