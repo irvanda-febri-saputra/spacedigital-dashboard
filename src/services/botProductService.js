@@ -107,8 +107,12 @@ const botProductService = {
 
   // Update variant
   updateVariant: async (productId, variantId, data) => {
+    console.log('[updateVariant] Starting update:', { productId, variantId, data });
+    
     const product = await botProductService.getProduct(productId);
     const productData = product.data || product; // Handle both response structures
+    
+    console.log('[updateVariant] Fetched product:', productData.name);
     
     // Parse variants - Laravel returns JSON string instead of array
     let variants = [];
@@ -125,20 +129,30 @@ const botProductService = {
       }
     }
     
+    console.log('[updateVariant] Current variants:', variants);
+    
     const index = variants.findIndex(v => v.id === variantId);
+    console.log('[updateVariant] Found variant at index:', index);
+    
     if (index >= 0) {
+      console.log('[updateVariant] Before merge:', variants[index]);
       variants[index] = { ...variants[index], ...data };
+      console.log('[updateVariant] After merge:', variants[index]);
     }
     
-    // Send full product data to preserve all fields
-    const response = await api.put(`/dashboard/products/${productId}`, {
+    const payload = {
       name: productData.name,
       description: productData.description,
       price: productData.price,
       category: productData.category,
       is_active: productData.is_active,
       variants: variants
-    });
+    };
+    
+    console.log('[updateVariant] Sending payload:', JSON.stringify(payload, null, 2));
+    
+    // Send full product data to preserve all fields
+    const response = await api.put(`/dashboard/products/${productId}`, payload);
     return response.data;
   },
 
