@@ -357,11 +357,17 @@ export default function BotProducts() {
 
   const handleDeleteVariant = async (productId, variantId) => {
     try {
+      setSaving(true)
       await botProductService.deleteVariant(productId, variantId)
       setToast({ message: 'Varian berhasil dihapus!', type: 'success' })
-      fetchProducts()
+      setDeleteConfirm(null)
+      setShowModal(false)
+      await fetchProducts()
     } catch (err) {
-      setToast({ message: 'Gagal menghapus varian', type: 'error' })
+      console.error('Delete variant error:', err)
+      setToast({ message: err.response?.data?.message || 'Gagal menghapus varian', type: 'error' })
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -811,31 +817,30 @@ export default function BotProducts() {
               {/* Product Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-500">Kode Barang</label>
+                  <label className="block text-sm text-gray-500 mb-1">Kode Barang</label>
                   <p className="font-bold text-lg font-mono">{detailProduct.product_code || '-'}</p>
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-500">Nama Produk</label>
-                  <p className="font-bold text-lg">{detailProduct.name}</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-gray-500">Kategori</label>
-                  <p className="font-medium">{detailProduct.category || '-'}</p>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-500">Status</label>
+                  <label className="block text-sm text-gray-500 mb-1">Status</label>
                   <span className={`neo-badge-${detailProduct.is_active ? 'success' : 'danger'}`}>
                     {detailProduct.is_active ? 'Aktif' : 'Nonaktif'}
                   </span>
                 </div>
               </div>
 
+              <div>
+                <label className="block text-sm text-gray-500 mb-1">Nama Produk</label>
+                <p className="font-bold text-xl">{detailProduct.name}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-500 mb-1">Kategori</label>
+                <p className="font-medium">{detailProduct.category || '-'}</p>
+              </div>
+
               {detailProduct.description && (
                 <div>
-                  <label className="block text-sm text-gray-500">Deskripsi</label>
+                  <label className="block text-sm text-gray-500 mb-1">Deskripsi</label>
                   <p className="text-gray-700">{detailProduct.description}</p>
                 </div>
               )}
@@ -889,12 +894,6 @@ export default function BotProducts() {
                             className="neo-btn-danger neo-btn-sm text-xs"
                           >
                             Hapus
-                          </button>
-                          <button
-                            onClick={() => openStockModal(detailProduct, v)}
-                            className="neo-btn-secondary neo-btn-sm text-xs"
-                          >
-                            + Stok
                           </button>
                         </div>
                       </div>
@@ -1259,7 +1258,8 @@ Hubungi admin untuk info lebih lanjut!`}
               <div className="flex gap-3">
                 <button
                   onClick={() => setDeleteConfirm(null)}
-                  className="neo-btn-secondary flex-1"
+                  disabled={saving}
+                  className="neo-btn-secondary flex-1 disabled:opacity-50"
                 >
                   Batal
                 </button>
@@ -1267,14 +1267,14 @@ Hubungi admin untuk info lebih lanjut!`}
                   onClick={() => {
                     if (deleteConfirm.type === 'variant') {
                       handleDeleteVariant(deleteConfirm.product?.id, deleteConfirm.variant?.id)
-                      setDeleteConfirm(null)
                     } else {
                       handleDeleteProduct(deleteConfirm)
                     }
                   }}
-                  className="neo-btn-primary bg-red-500 hover:bg-red-600 flex-1"
+                  disabled={saving}
+                  className="neo-btn-primary bg-red-500 hover:bg-red-600 flex-1 disabled:opacity-50"
                 >
-                  Hapus
+                  {saving ? 'Menghapus...' : 'Hapus'}
                 </button>
               </div>
             </div>

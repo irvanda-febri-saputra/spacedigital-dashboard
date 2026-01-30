@@ -156,37 +156,11 @@ const botProductService = {
     return response.data;
   },
 
-  // Delete variant
+  // Delete variant - using proper API endpoint
   deleteVariant: async (productId, variantId) => {
-    const product = await botProductService.getProduct(productId);
-    const productData = product.data || product; // Handle both response structures
-    
-    // Parse variants - Laravel returns JSON string instead of array
-    let variants = [];
-    if (productData.variants) {
-      if (typeof productData.variants === 'string') {
-        try {
-          variants = JSON.parse(productData.variants);
-        } catch (e) {
-          console.warn('[deleteVariant] Failed to parse variants JSON:', e);
-          variants = [];
-        }
-      } else if (Array.isArray(productData.variants)) {
-        variants = productData.variants;
-      }
-    }
-    
-    variants = variants.filter(v => v.id !== variantId);
-    
-    // Send full product data to preserve all fields
-    const response = await api.put(`/dashboard/products/${productId}`, {
-      name: productData.name,
-      description: productData.description,
-      price: productData.price,
-      category: productData.category,
-      is_active: productData.is_active,
-      variants: variants
-    });
+    console.log('[deleteVariant] Deleting variant:', variantId, 'from product:', productId);
+    const response = await api.delete(`/dashboard/variants/${variantId}`);
+    console.log('[deleteVariant] Response:', response.data);
     return response.data;
   },
 
