@@ -190,40 +190,31 @@ export default function PaymentGatewaysIndex() {
                                         <p className="font-semibold text-gray-900">{userGateway.gateway?.name}</p>
                                         <p className="text-xs text-gray-500">{userGateway.label || userGateway.gateway?.code}</p>
                                     </div>
-                                    <div className="flex flex-col items-end gap-2">
-                                        {/* Toggle Switch */}
-                                        <button
-                                            onClick={async () => {
-                                                try {
-                                                    await gatewayService.toggleActive(userGateway.id);
-                                                    await fetchData();
-                                                } catch (err) {
-                                                    console.error('Error toggling gateway:', err);
-                                                }
-                                            }}
-                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                                                userGateway.is_active ? 'bg-green-500' : 'bg-gray-300'
-                                            }`}
-                                        >
-                                            <span
-                                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                                    userGateway.is_active ? 'translate-x-6' : 'translate-x-1'
-                                                }`}
-                                            />
-                                        </button>
-                                        <span className="text-xs text-gray-500">
-                                            {userGateway.is_active ? 'Active' : 'Inactive'}
-                                        </span>
-                                    </div>
+                                    <span className={`neo-badge ${
+                                        userGateway.is_active
+                                            ? 'neo-badge-success'
+                                            : 'neo-badge-danger'
+                                    }`}>
+                                        {userGateway.is_active ? 'Active' : 'Inactive'}
+                                    </span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
                                     <span>Fee: {Number(userGateway.gateway?.fee_percent)}%{userGateway.gateway?.fee_flat > 0 && ` + Rp ${Number(userGateway.gateway?.fee_flat).toLocaleString()}`}</span>
-                                    {isUsedByBot(userGateway.id) && (
-                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-md">
-                                            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-                                            In Use
-                                        </span>
-                                    )}
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs text-gray-500">Digunakan</span>
+                                        <button
+                                            disabled
+                                            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                                                isUsedByBot(userGateway.id) ? 'bg-green-500' : 'bg-gray-300'
+                                            }`}
+                                        >
+                                            <span
+                                                className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                                                    isUsedByBot(userGateway.id) ? 'translate-x-5' : 'translate-x-1'
+                                                }`}
+                                            />
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="flex gap-2">
                                     <Link
@@ -288,38 +279,31 @@ export default function PaymentGatewaysIndex() {
                                             </td>
                                             <td className="px-4 py-4">
                                                 <div className="flex items-center gap-3">
-                                                    {/* Toggle Switch for Active/Inactive */}
-                                                    <button
-                                                        onClick={async () => {
-                                                            try {
-                                                                await gatewayService.toggleActive(userGateway.id);
-                                                                await fetchData();
-                                                            } catch (err) {
-                                                                console.error('Error toggling gateway:', err);
-                                                            }
-                                                        }}
-                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
-                                                            userGateway.is_active ? 'bg-green-500' : 'bg-gray-300'
-                                                        }`}
-                                                        title={userGateway.is_active ? 'Active - Click to deactivate' : 'Inactive - Click to activate'}
-                                                    >
-                                                        <span
-                                                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                                                userGateway.is_active ? 'translate-x-6' : 'translate-x-1'
-                                                            }`}
-                                                        />
-                                                    </button>
-                                                    <span className="text-sm text-gray-600 min-w-[60px]">
+                                                    <span className={`neo-badge ${
+                                                        userGateway.is_active
+                                                            ? 'neo-badge-success'
+                                                            : 'neo-badge-danger'
+                                                    }`}>
                                                         {userGateway.is_active ? 'Active' : 'Inactive'}
                                                     </span>
                                                     
-                                                    {/* In Use Indicator */}
-                                                    {isUsedByBot(userGateway.id) && (
-                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-md" title={`Digunakan oleh: ${getBotsUsingGateway(userGateway.id).map(b => b.name).join(', ')}`}>
-                                                            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-                                                            In Use
-                                                        </span>
-                                                    )}
+                                                    {/* Toggle for Digunakan */}
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs text-gray-500">Digunakan</span>
+                                                        <button
+                                                            disabled
+                                                            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                                                                isUsedByBot(userGateway.id) ? 'bg-green-500' : 'bg-gray-300'
+                                                            }`}
+                                                            title={isUsedByBot(userGateway.id) ? `Digunakan oleh: ${getBotsUsingGateway(userGateway.id).map(b => b.name).join(', ')}` : 'Tidak digunakan'}
+                                                        >
+                                                            <span
+                                                                className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                                                                    isUsedByBot(userGateway.id) ? 'translate-x-5' : 'translate-x-1'
+                                                                }`}
+                                                            />
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td className="px-4 py-4 text-sm text-gray-600">
