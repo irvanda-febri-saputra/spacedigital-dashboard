@@ -95,6 +95,10 @@ export default function Stocks() {
   const [stocks, setStocks] = useState([])
   const [stockLoading, setStockLoading] = useState(false)
 
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+
   // Modal
   const [showAddModal, setShowAddModal] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -152,7 +156,29 @@ export default function Stocks() {
   const fetchVariantsForProduct = async (productId) => {
     try {
       const response = await stockService.getProductVariants(productId)
-      setVariants(response.data || response || [])
+      const variantsData = response.data || response || []
+      
+      // Fetch stock count for each variant
+      const variantsWithStock = await Promise.all(
+        variantsData.map(async (variant) => {
+          try {
+            const stockResponse = await stockService.getStocks({
+              product_id: productId,
+              variant_id: variant.id,
+              is_sold: false
+            })
+            const stockData = stockResponse.data || stockResponse || []
+            return {
+              ...variant,
+              stock_count: Array.isArray(stockData) ? stockData.length : 0
+            }
+          } catch {
+            return { ...variant, stock_count: 0 }
+          }
+        })
+      )
+      
+      setVariants(variantsWithStock)
     } catch (error) {
       setVariants([])
     }
@@ -170,6 +196,7 @@ export default function Stocks() {
   const fetchStocksForProduct = async (productId, variantId = '') => {
     try {
       setStockLoading(true)
+      setCurrentPage(1) // Reset pagination
       const params = { product_id: productId, is_sold: false }
       if (variantId) params.variant_id = variantId
       
@@ -397,7 +424,7 @@ export default function Stocks() {
       {selectedProduct ? (
         <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
           {/* Header */}
-          <div className="bg-yellow-300 border-b-4 border-black p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="bg-primary-100 border-b-4 border-black p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div className="flex items-center gap-2">
               <IconPackage className="w-5 h-5" />
               <span className="font-bold">{stocks.length} stok tersedia</span>
@@ -451,55 +478,87 @@ export default function Stocks() {
                 <p className="text-gray-500 font-bold">Tidak ada stok tersedia</p>
               </div>
             ) : (
-              <table className="w-full">
-                <thead className="bg-gray-100 border-b-4 border-black">
-                  <tr>
-                    <th className="text-left p-3 font-bold">#</th>
-                    <th className="text-left p-3 font-bold">Data</th>
-                    {!selectedVariant && variants.length > 0 && (
-                      <th className="text-left p-3 font-bold">Variant</th>
-                    )}
-                    <th className="text-right p-3 font-bold">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stocks.map((stock, idx) => (
-                    <tr key={stock.id} className="border-b-2 border-gray-200 hover:bg-gray-50">
-                      <td className="p-3 text-gray-500 font-mono">{idx + 1}</td>
-                      <td className="p-3">
-                        <div className="flex items-center gap-2">
-                          <code className="text-sm bg-gray-100 px-2 py-1 border border-gray-300 truncate max-w-xs">
-                            {stock.data}
-                          </code>
-                          <button
-                            onClick={() => copyToClipboard(stock.data)}
-                            className="p-1 text-gray-400 hover:text-black"
-                          >
-                            <IconCopy className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
+              <>
+                <table className="w-full">
+                  <thead className="bg-gray-100 border-b-4 border-black">
+                    <tr>
+                      <th className="text-left p-3 font-bold">#</th>
+                      <th className="text-left p-3 font-bold">Data</th>
                       {!selectedVariant && variants.length > 0 && (
-                        <td className="p-3">
-                          {stock.variant && (
-                            <span className="bg-purple-100 border-2 border-black px-2 py-1 text-sm font-medium">
-                              {stock.variant.name}
-                            </span>
-                          )}
-                        </td>
+                        <th className="text-left p-3 font-bold">Variant</th>
                       )}
-                      <td className="p-3 text-right">
-                        <button
-                          onClick={() => setDeleteConfirm(stock)}
-                          className="p-2 text-red-600 hover:bg-red-50 border-2 border-transparent hover:border-red-200"
-                        >
-                          <IconTrash className="w-4 h-4" />
-                        </button>
-                      </td>
+                      <th className="text-right p-3 font-bold">Aksi</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {stocks
+                      .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                      .map((stock, idx) => {
+                        const actualIndex = (currentPage - 1) * itemsPerPage + idx + 1
+                        return (
+                          <tr key={stock.id} className="border-b-2 border-gray-200 hover:bg-gray-50">
+                            <td className="p-3 text-gray-500 font-mono">{actualIndex}</td>
+                            <td className="p-3">
+                              <div className="flex items-center gap-2">
+                                <code className="text-sm bg-gray-100 px-2 py-1 border border-gray-300 truncate max-w-xs">
+                                  {stock.data}
+                                </code>
+                                <button
+                                  onClick={() => copyToClipboard(stock.data)}
+                                  className="p-1 text-gray-400 hover:text-black"
+                                >
+                                  <IconCopy className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                            {!selectedVariant && variants.length > 0 && (
+                              <td className="p-3">
+                                {stock.variant && (
+                                  <span className="bg-purple-100 border-2 border-black px-2 py-1 text-sm font-medium">
+                                    {stock.variant.name}
+                                  </span>
+                                )}
+                              </td>
+                            )}
+                            <td className="p-3 text-right">
+                              <button
+                                onClick={() => setDeleteConfirm(stock)}
+                                className="p-2 text-red-600 hover:bg-red-50 border-2 border-transparent hover:border-red-200"
+                              >
+                                <IconTrash className="w-4 h-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                  </tbody>
+                </table>
+                
+                {/* Pagination */}
+                {stocks.length > itemsPerPage && (
+                  <div className="border-t-4 border-black p-4 bg-gray-50 flex items-center justify-between">
+                    <p className="text-sm text-gray-600">
+                      Menampilkan {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, stocks.length)} dari {stocks.length} stok
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className="neo-btn-secondary neo-btn-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Previous
+                      </button>
+                      <button
+                        onClick={() => setCurrentPage(p => Math.min(Math.ceil(stocks.length / itemsPerPage), p + 1))}
+                        disabled={currentPage >= Math.ceil(stocks.length / itemsPerPage)}
+                        className="neo-btn-secondary neo-btn-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -515,7 +574,7 @@ export default function Stocks() {
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="border-b-4 border-black p-4 bg-yellow-300 flex justify-between items-center">
+            <div className="border-b-4 border-black p-4 bg-primary-100 flex justify-between items-center">
               <h2 className="text-xl font-black">Tambah Stok</h2>
               <button 
                 onClick={() => {
@@ -523,7 +582,7 @@ export default function Stocks() {
                   setForm({ product_id: '', variant_id: '', data: '' })
                   setFormVariants([])
                 }}
-                className="p-1 hover:bg-yellow-400"
+                className="p-1 hover:bg-primary-200"
               >
                 <IconX className="w-6 h-6" />
               </button>
