@@ -355,14 +355,7 @@ export default function ProductCreate() {
             disabled={saving}
             className="neo-btn-primary flex-1 flex items-center justify-center gap-2"
           >
-            {saving ? (
-              'Menyimpan...'
-            ) : (
-              <>
-                <span>💾</span>
-                Simpan Produk & Variant
-              </>
-            )}
+            {saving ? 'Menyimpan...' : 'Simpan Produk & Variant'}
           </button>
         </div>
       </form>
