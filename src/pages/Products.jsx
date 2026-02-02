@@ -76,7 +76,9 @@ export default function Products() {
         productService.getProducts({ bot_id: selectedBot || undefined }),
         botService.getAll()
       ])
-      setProducts(productsRes.data || [])
+      // Handle both paginated and non-paginated responses
+      const productData = Array.isArray(productsRes.data) ? productsRes.data : (productsRes.data?.data || productsRes.data || [])
+      setProducts(productData)
       setBots(botsRes.data || [])
     } catch (err) {
       console.error('Error fetching data:', err)

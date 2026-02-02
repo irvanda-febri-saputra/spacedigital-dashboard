@@ -3,7 +3,9 @@ import api from './api';
 const productService = {
   // Get all products
   getProducts: async (params = {}) => {
-    const response = await api.get('/dashboard/products', { params });
+    // Add per_page: 'all' to get all products without pagination limit
+    const queryParams = { per_page: 'all', ...params };
+    const response = await api.get('/dashboard/products', { params: queryParams });
     return response.data;
   },
 
