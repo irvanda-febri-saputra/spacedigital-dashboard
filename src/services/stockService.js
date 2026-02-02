@@ -3,7 +3,9 @@ import api from './api'
 const stockService = {
   // Get all stocks with filters
   async getStocks(params = {}) {
-    const response = await api.get('/dashboard/stocks', { params })
+    // Add per_page: 'all' to fetch all stocks without limit
+    const queryParams = { per_page: 'all', ...params }
+    const response = await api.get('/dashboard/stocks', { params: queryParams })
     return response.data
   },
 

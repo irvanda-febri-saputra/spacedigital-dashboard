@@ -201,7 +201,9 @@ export default function Stocks() {
       if (variantId) params.variant_id = variantId
       
       const response = await stockService.getStocks(params)
-      setStocks(response.data || response || [])
+      // Handle both paginated and non-paginated responses
+      const stockData = Array.isArray(response.data) ? response.data : (response.data?.data || response.data || [])
+      setStocks(stockData)
       setHastebinLink('')
     } catch (error) {
       setStocks([])
