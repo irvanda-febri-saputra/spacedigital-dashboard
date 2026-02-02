@@ -31,6 +31,15 @@ function IconTrash({ className }) {
   )
 }
 
+function IconEdit({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+    </svg>
+  )
+}
+
 function IconLink({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -101,6 +110,7 @@ export default function Stocks() {
 
   // Modal
   const [showAddModal, setShowAddModal] = useState(false)
+  const [editStock, setEditStock] = useState(null)
   const [saving, setSaving] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(null)
 
@@ -243,6 +253,27 @@ export default function Stocks() {
       fetchProducts()
     } catch (error) {
       showToast(error.response?.data?.message || 'Gagal menambah stock', 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleUpdateStock = async (e) => {
+    e.preventDefault()
+    if (!editStock.data.trim()) {
+      showToast('Data stock tidak boleh kosong', 'error')
+      return
+    }
+
+    try {
+      setSaving(true)
+      await stockService.updateStock(editStock.id, { data: editStock.data })
+      showToast('Stock berhasil diupdate!', 'success')
+      setEditStock(null)
+      fetchStocksForProduct(selectedProduct, selectedVariant)
+      fetchStats()
+    } catch (error) {
+      showToast(error.response?.data?.message || 'Gagal update stock', 'error')
     } finally {
       setSaving(false)
     }
@@ -523,12 +554,22 @@ export default function Stocks() {
                               </td>
                             )}
                             <td className="p-3 text-right">
-                              <button
-                                onClick={() => setDeleteConfirm(stock)}
-                                className="p-2 text-red-600 hover:bg-red-50 border-2 border-transparent hover:border-red-200"
-                              >
-                                <IconTrash className="w-4 h-4" />
-                              </button>
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  onClick={() => setEditStock(stock)}
+                                  className="p-2 text-blue-600 hover:bg-blue-50 border-2 border-transparent hover:border-blue-200"
+                                  title="Edit Stock"
+                                >
+                                  <IconEdit className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => setDeleteConfirm(stock)}
+                                  className="p-2 text-red-600 hover:bg-red-50 border-2 border-transparent hover:border-red-200"
+                                  title="Hapus Stock"
+                                >
+                                  <IconTrash className="w-4 h-4" />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         )
@@ -658,6 +699,65 @@ export default function Stocks() {
                   className="neo-btn-primary flex-1"
                 >
                   {saving ? 'Menyimpan...' : 'Simpan Stok'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Stock Modal */}
+      {editStock && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] w-full max-w-lg">
+            <div className="border-b-4 border-black p-4 bg-blue-100 flex justify-between items-center">
+              <h2 className="text-xl font-black">Edit Stok</h2>
+              <button 
+                onClick={() => setEditStock(null)}
+                className="p-1 hover:bg-blue-200"
+              >
+                <IconX className="w-6 h-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateStock} className="p-6 space-y-4">
+              <div>
+                <label className="block font-bold mb-2">Data Stok *</label>
+                <textarea
+                  value={editStock.data}
+                  onChange={(e) => setEditStock({ ...editStock, data: e.target.value })}
+                  placeholder="email@example.com|password123"
+                  className="neo-input h-40 resize-none font-mono text-sm"
+                  required
+                  autoFocus
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  Edit data akun sesuai kebutuhan
+                </p>
+              </div>
+
+              <div className="bg-gray-100 border-2 border-gray-300 p-3 rounded">
+                <p className="text-xs text-gray-600 mb-1 font-bold">INFO:</p>
+                {editStock.variant && (
+                  <p className="text-sm text-gray-700">Variant: <span className="font-bold">{editStock.variant.name}</span></p>
+                )}
+                <p className="text-xs text-gray-500 mt-1">ID: {editStock.id}</p>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setEditStock(null)}
+                  className="neo-btn-secondary flex-1"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="neo-btn-primary flex-1"
+                >
+                  {saving ? 'Menyimpan...' : 'Update Stok'}
                 </button>
               </div>
             </form>
