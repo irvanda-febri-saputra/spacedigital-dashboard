@@ -113,6 +113,7 @@ export default function Stocks() {
   const [editStock, setEditStock] = useState(null)
   const [saving, setSaving] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(null)
+  const [deleteAllConfirm, setDeleteAllConfirm] = useState(false)
 
   // Hastebin
   const [hastebinLoading, setHastebinLoading] = useState(false)
@@ -289,6 +290,19 @@ export default function Stocks() {
       fetchProducts()
     } catch (error) {
       showToast('Gagal menghapus stock', 'error')
+    }
+  }
+
+  const handleDeleteAll = async () => {
+    try {
+      await stockService.deleteAllStocks(selectedProduct, selectedVariant || null)
+      showToast('Semua stock berhasil dihapus', 'success')
+      setDeleteAllConfirm(false)
+      fetchStocksForProduct(selectedProduct, selectedVariant)
+      fetchStats()
+      fetchProducts()
+    } catch (error) {
+      showToast('Gagal menghapus semua stock', 'error')
     }
   }
 
@@ -469,6 +483,14 @@ export default function Stocks() {
               >
                 <IconRefresh className="w-4 h-4" />
                 Refresh
+              </button>
+              <button
+                onClick={() => setDeleteAllConfirm(true)}
+                disabled={stocks.length === 0}
+                className="neo-btn-danger px-3 py-2 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <IconTrash className="w-4 h-4" />
+                Hapus Semua
               </button>
               <button
                 onClick={generateHastebinLink}
@@ -786,6 +808,45 @@ export default function Stocks() {
                 className="neo-btn-danger flex-1"
               >
                 Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete All Confirmation */}
+      {deleteAllConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] w-full max-w-lg p-6 text-center">
+            <IconTrash className="w-16 h-16 mx-auto mb-4 text-red-500" />
+            <h3 className="text-xl font-bold mb-2 text-red-600">Hapus Semua Stok?</h3>
+            <div className="bg-red-50 border-2 border-red-200 p-4 mb-6 text-left">
+              <p className="text-sm text-red-700 font-medium mb-2">
+                ⚠️ Tindakan ini akan menghapus SEMUA stok untuk:
+              </p>
+              <ul className="text-sm text-red-600 space-y-1">
+                <li>• Produk: <strong>{products.find(p => p.id == selectedProduct)?.name}</strong></li>
+                {selectedVariant && (
+                  <li>• Variant: <strong>{variants.find(v => v.id == selectedVariant)?.name}</strong></li>
+                )}
+                <li>• Jumlah stok: <strong>{stocks.length} item</strong></li>
+              </ul>
+              <p className="text-xs text-red-500 mt-3 font-bold">
+                Data yang dihapus tidak dapat dikembalikan!
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteAllConfirm(false)}
+                className="neo-btn-secondary flex-1"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleDeleteAll}
+                className="neo-btn-danger flex-1"
+              >
+                Ya, Hapus Semua
               </button>
             </div>
           </div>

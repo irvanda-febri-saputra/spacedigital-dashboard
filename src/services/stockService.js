@@ -33,6 +33,14 @@ const stockService = {
     return response.data
   },
 
+  // Delete all stocks for a product/variant
+  async deleteAllStocks(productId, variantId = null) {
+    const params = { product_id: productId }
+    if (variantId) params.variant_id = variantId
+    const response = await api.delete('/dashboard/stocks/bulk-delete', { params })
+    return response.data
+  },
+
   // Bulk import
   async bulkImport(data) {
     const response = await api.post('/dashboard/stocks/bulk-import', data)
