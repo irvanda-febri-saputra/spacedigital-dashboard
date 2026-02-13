@@ -63,15 +63,7 @@ export default function Login() {
                 <div className="neo-card p-8">
                     {/* Logo */}
                     <div className="text-center mb-6">
-                        <div className="inline-flex items-center justify-center mb-4">
-                            <div className="relative">
-                                <div className="absolute inset-0 bg-gray-900 rounded-xl translate-x-1 translate-y-1"></div>
-                                <div className="relative w-14 h-14 bg-[#8B5CF6] rounded-xl border-2 border-gray-900 flex items-center justify-center">
-                                    <span className="text-white font-black text-xl">S</span>
-                                </div>
-                            </div>
-                        </div>
-                        <h1 className="text-xl font-black text-gray-900 tracking-tight">SPACEDIGITAL</h1>
+                        <h1 className="text-xl font-black text-gray-900 tracking-tight underline decoration-[#8B5CF6] decoration-2 underline-offset-4">SPACEDIGITAL</h1>
                     </div>
 
                     {/* Header */}
