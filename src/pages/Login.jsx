@@ -57,23 +57,15 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center p-6">
-            <div className="w-full max-w-md">
-                {/* Login Card - Neo Brutalism */}
-                <div className="neo-card p-8">
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+            <div className="w-full max-w-sm">
+                {/* Login Card */}
+                <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200">
                     {/* Logo */}
-                    <div className="text-center mb-6">
-                        <h1 className="text-xl font-black text-gray-900 tracking-tight underline decoration-[#8B5CF6] decoration-2 underline-offset-4">SPACEDIGITAL</h1>
-                    </div>
-
-                    {/* Header */}
                     <div className="text-center mb-8">
-                        <h2 className="text-2xl font-bold text-gray-900">
-                            Welcome Back
-                        </h2>
-                        <p className="text-gray-500 mt-2">
-                            Sign in to access your dashboard
-                        </p>
+                        <h1 className="text-3xl font-black text-gray-900 tracking-tight">SPACEDIGITAL</h1>
+                        <div className="w-20 h-1 bg-[#8B5CF6] mx-auto mt-2 mb-4"></div>
+                        <p className="text-gray-600 text-lg">Sign in to your account</p>
                     </div>
 
                     {/* Success Message */}
@@ -104,25 +96,25 @@ export default function Login() {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-4">
                         {/* Email */}
                         <div>
-                            <label className="block text-sm font-semibold text-gray-900 mb-2">
-                                Email
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Username or Telegram Username
                             </label>
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="neo-input"
-                                placeholder="name@example.com"
+                                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#8B5CF6] text-gray-900"
+                                placeholder=""
                                 required
                             />
                         </div>
 
                         {/* Password */}
                         <div>
-                            <label className="block text-sm font-semibold text-gray-900 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Password
                             </label>
                             <div className="relative">
@@ -130,8 +122,8 @@ export default function Login() {
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="neo-input pr-12"
-                                    placeholder="Enter your password"
+                                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#8B5CF6] text-gray-900 pr-12"
+                                    placeholder=""
                                     required
                                 />
                                 <button
@@ -172,13 +164,13 @@ export default function Login() {
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <input
                                     type="checkbox"
-                                    className="w-4 h-4 rounded border-2 border-gray-900 text-[#8B5CF6] focus:ring-[#8B5CF6]"
+                                    className="w-4 h-4 rounded border-2 border-gray-300 text-[#8B5CF6] focus:ring-[#8B5CF6]"
                                 />
                                 <span className="text-sm text-gray-600">Remember me</span>
                             </label>
                             <Link
                                 to="/forgot-password"
-                                className="text-sm font-semibold text-[#8B5CF6] hover:underline"
+                                className="text-sm text-[#8B5CF6] hover:underline"
                             >
                                 Forgot password?
                             </Link>
@@ -188,7 +180,7 @@ export default function Login() {
                         <button
                             type="submit"
                             disabled={isLoading || !turnstileToken}
-                            className="neo-button-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full bg-[#8B5CF6] text-white py-3 px-4 rounded-lg font-medium hover:bg-[#7C3AED] focus:outline-none focus:ring-2 focus:ring-[#8B5CF6] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
                         >
                             {isLoading ? (
                                 <span className="flex items-center justify-center gap-2">
@@ -199,19 +191,24 @@ export default function Login() {
                                     Signing in...
                                 </span>
                             ) : (
-                                'Sign In'
+                                'Sign in'
                             )}
                         </button>
                     </form>
 
+                    {/* Divider */}
+                    <div className="text-center text-gray-400 text-sm my-4">
+                        OR
+                    </div>
+
                     {/* Register Link */}
-                    <p className="text-center text-sm text-gray-500 mt-6">
+                    <p className="text-center text-sm text-gray-600">
                         Don't have an account?{' '}
                         <Link
                             to="/register"
-                            className="font-semibold text-[#8B5CF6] hover:underline"
+                            className="font-medium text-[#8B5CF6] hover:underline"
                         >
-                            Create one
+                            Register
                         </Link>
                     </p>
                 </div>
