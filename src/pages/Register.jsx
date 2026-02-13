@@ -86,7 +86,7 @@ export default function Register() {
         </div>
 
         {/* Register Card */}
-        <div className="bg-white p-8 border-4 border-black rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <div className="bg-white p-8 border-4 border-black rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-2 transition-all duration-300 ease-in-out cursor-pointer">
           {/* Info Box - Blue */}
           <div className="mb-6 p-4 bg-blue-50 border-2 border-blue-500 rounded-lg shadow-[3px_3px_0_#3b82f6]">
             <div className="flex items-center gap-3">
