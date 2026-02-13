@@ -817,37 +817,60 @@ export default function Stocks() {
       {/* Delete All Confirmation */}
       {deleteAllConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] w-full max-w-lg p-6 text-center">
-            <IconTrash className="w-16 h-16 mx-auto mb-4 text-red-500" />
-            <h3 className="text-xl font-bold mb-2 text-red-600">Hapus Semua Stok?</h3>
-            <div className="bg-red-50 border-2 border-red-200 p-4 mb-6 text-left">
-              <p className="text-sm text-red-700 font-medium mb-2">
-                ⚠️ Tindakan ini akan menghapus SEMUA stok untuk:
-              </p>
-              <ul className="text-sm text-red-600 space-y-1">
-                <li>• Produk: <strong>{products.find(p => p.id == selectedProduct)?.name}</strong></li>
-                {selectedVariant && (
-                  <li>• Variant: <strong>{variants.find(v => v.id == selectedVariant)?.name}</strong></li>
-                )}
-                <li>• Jumlah stok: <strong>{stocks.length} item</strong></li>
-              </ul>
-              <p className="text-xs text-red-500 mt-3 font-bold">
-                Data yang dihapus tidak dapat dikembalikan!
-              </p>
+          <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] w-full max-w-lg">
+            <div className="border-b-4 border-black p-4 bg-red-100">
+              <div className="flex items-center gap-3">
+                <IconTrash className="w-8 h-8 text-red-600" />
+                <h3 className="text-xl font-black text-red-700 uppercase tracking-wide">Hapus Semua Stok?</h3>
+              </div>
             </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setDeleteAllConfirm(false)}
-                className="neo-btn-secondary flex-1"
-              >
-                Batal
-              </button>
-              <button
-                onClick={handleDeleteAll}
-                className="neo-btn-danger flex-1"
-              >
-                Ya, Hapus Semua
-              </button>
+            
+            <div className="p-6">
+              <div className="bg-yellow-100 border-4 border-yellow-400 p-4 mb-6">
+                <p className="font-black text-yellow-800 uppercase tracking-wide mb-3 text-sm">
+                  ⚠️ PERINGATAN PENTING!
+                </p>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="font-black text-yellow-700">PRODUK:</span>
+                    <span className="bg-white border-2 border-black px-2 py-1 font-bold">
+                      {products.find(p => p.id == selectedProduct)?.name}
+                    </span>
+                  </div>
+                  {selectedVariant && (
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-yellow-700">VARIANT:</span>
+                      <span className="bg-purple-200 border-2 border-black px-2 py-1 font-bold">
+                        {variants.find(v => v.id == selectedVariant)?.name}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <span className="font-black text-yellow-700">JUMLAH:</span>
+                    <span className="bg-red-200 border-2 border-black px-2 py-1 font-bold text-red-700">
+                      {stocks.length} STOK
+                    </span>
+                  </div>
+                </div>
+                <p className="text-xs font-black text-red-600 mt-3 uppercase tracking-wider">
+                  DATA TERHAPUS TIDAK DAPAT DIKEMBALIKAN!
+                </p>
+              </div>
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setDeleteAllConfirm(false)}
+                  className="neo-btn-secondary flex-1 font-black uppercase tracking-wide"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleDeleteAll}
+                  className="neo-btn-danger flex-1 font-black uppercase tracking-wide"
+                >
+                  Ya, Hapus Semua!
+                </button>
+              </div>
             </div>
           </div>
         </div>
