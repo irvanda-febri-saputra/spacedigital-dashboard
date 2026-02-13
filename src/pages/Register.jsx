@@ -82,7 +82,7 @@ export default function Register() {
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Create an Account</h1>
           <div className="h-0.5 bg-[#8B5CF6] mx-auto mt-2 mb-4" style={{width: 'fit-content', minWidth: '150px'}}></div>
-          <p className="text-gray-600">Join Spacedigital to access card checking services</p>
+          <p className="text-gray-600">Join Spacedigital to manage bot store telegram</p>
         </div>
 
         {/* Register Card */}
