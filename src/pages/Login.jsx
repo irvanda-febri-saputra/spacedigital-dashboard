@@ -128,8 +128,8 @@ export default function Login() {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full px-4 py-3 border-2 border-black rounded-lg focus:outline-none focus:border-[#8B5CF6] text-gray-900 font-medium"
-                                placeholder=""
+                                className="w-full px-4 py-3 border-2 border-black rounded-lg focus:outline-none focus:border-[#8B5CF6] focus:shadow-[6px_6px_0px_0px_rgba(139,92,246,0.3)] text-gray-900 font-medium shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-200 ease-in-out"
+                                placeholder="Enter your email"
                                 required
                             />
                         </div>
@@ -144,14 +144,14 @@ export default function Login() {
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full px-4 py-3 pr-12 border-2 border-black rounded-lg focus:outline-none focus:border-[#8B5CF6] text-gray-900 font-medium"
-                                    placeholder=""
+                                    className="w-full px-4 py-3 pr-12 border-2 border-black rounded-lg focus:outline-none focus:border-[#8B5CF6] focus:shadow-[6px_6px_0px_0px_rgba(139,92,246,0.3)] text-gray-900 font-medium shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-200 ease-in-out"
+                                    placeholder="Enter your password"
                                     required
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                                 >
                                     {showPassword ? (
                                         <IconEyeOff className="w-5 h-5" />

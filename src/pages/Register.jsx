@@ -136,7 +136,7 @@ export default function Register() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="neo-input"
+                className="w-full px-4 py-3 border-2 border-black rounded-lg focus:outline-none focus:border-[#8B5CF6] focus:shadow-[6px_6px_0px_0px_rgba(139,92,246,0.3)] text-gray-900 font-medium shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-200 ease-in-out"
                 placeholder="John Doe"
                 required
               />
@@ -155,7 +155,7 @@ export default function Register() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="neo-input"
+                className="w-full px-4 py-3 border-2 border-black rounded-lg focus:outline-none focus:border-[#8B5CF6] focus:shadow-[6px_6px_0px_0px_rgba(139,92,246,0.3)] text-gray-900 font-medium shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-200 ease-in-out"
                 placeholder="name@example.com"
                 required
               />
@@ -175,14 +175,14 @@ export default function Register() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="neo-input pr-12"
+                  className="w-full px-4 py-3 pr-12 border-2 border-black rounded-lg focus:outline-none focus:border-[#8B5CF6] focus:shadow-[6px_6px_0px_0px_rgba(139,92,246,0.3)] text-gray-900 font-medium shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-200 ease-in-out"
                   placeholder="••••••••"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                 >
                   {showPassword ? <IconEyeOff className="w-5 h-5" /> : <IconEye className="w-5 h-5" />}
                 </button>
@@ -205,7 +205,7 @@ export default function Register() {
                 name="password_confirmation"
                 value={formData.password_confirmation}
                 onChange={handleChange}
-                className="neo-input"
+                className="w-full px-4 py-3 border-2 border-black rounded-lg focus:outline-none focus:border-[#8B5CF6] focus:shadow-[6px_6px_0px_0px_rgba(139,92,246,0.3)] text-gray-900 font-medium shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-200 ease-in-out"
                 placeholder="••••••••"
                 required
               />
