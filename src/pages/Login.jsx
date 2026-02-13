@@ -81,15 +81,15 @@ export default function Login() {
     return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
             <div className="w-full max-w-md">
+                {/* Header Outside Card */}
+                <div className="text-center mb-8">
+                    <h1 className="text-2xl font-bold text-gray-900">SPACEDIGITAL</h1>
+                    <div className="w-16 h-0.5 bg-[#8B5CF6] mx-auto mt-2 mb-4"></div>
+                    <p className="text-gray-600">Sign in to your account</p>
+                </div>
+
                 {/* Login Card */}
                 <div className="bg-white p-8 border border-gray-200 shadow-sm">
-                    {/* Logo */}
-                    <div className="text-center mb-8">
-                        <h1 className="text-2xl font-bold text-gray-900">SPACEDIGITAL</h1>
-                        <div className="w-16 h-0.5 bg-[#8B5CF6] mx-auto mt-2 mb-4"></div>
-                        <p className="text-gray-600">Sign in to your account</p>
-                    </div>
-
                     {/* Success Message */}
                     {successMessage && (
                         <div className="mb-6 p-4 bg-green-50 border-2 border-green-500 rounded-lg shadow-[3px_3px_0_#22c55e]">
