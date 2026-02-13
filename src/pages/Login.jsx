@@ -89,7 +89,7 @@ export default function Login() {
                 </div>
 
                 {/* Login Card */}
-                <div className="bg-white p-8 border border-gray-200 shadow-sm">
+                <div className="bg-white p-8 border-4 border-black rounded-2xl shadow-lg">
                     {/* Success Message */}
                     {successMessage && (
                         <div className="mb-6 p-4 bg-green-50 border-2 border-green-500 rounded-lg shadow-[3px_3px_0_#22c55e]">
@@ -128,7 +128,7 @@ export default function Login() {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-[#8B5CF6] text-gray-900"
+                                className="w-full px-4 py-3 border-2 border-black rounded-lg focus:outline-none focus:border-[#8B5CF6] text-gray-900 font-medium"
                                 placeholder=""
                                 required
                             />
@@ -144,7 +144,7 @@ export default function Login() {
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full px-3 py-2 pr-10 border border-gray-300 focus:outline-none focus:border-[#8B5CF6] text-gray-900"
+                                    className="w-full px-4 py-3 pr-12 border-2 border-black rounded-lg focus:outline-none focus:border-[#8B5CF6] text-gray-900 font-medium"
                                     placeholder=""
                                     required
                                 />
@@ -204,7 +204,7 @@ export default function Login() {
                         <button
                             type="submit"
                             disabled={isLoading || !turnstileToken}
-                            className="w-full bg-[#8B5CF6] text-white py-2.5 px-4 text-sm font-medium hover:bg-[#7C3AED] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#8B5CF6] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className="w-full bg-[#8B5CF6] text-white py-3 px-4 text-sm font-bold rounded-lg hover:bg-[#7C3AED] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#8B5CF6] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
                         >
                             {isLoading ? (
                                 <span className="flex items-center justify-center gap-2">
