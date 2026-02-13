@@ -16,9 +16,22 @@ export default function Login() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
+    const [rememberMe, setRememberMe] = useState(false)
     const [turnstileToken, setTurnstileToken] = useState('')
     const [turnstileError, setTurnstileError] = useState('')
     const [successMessage, setSuccessMessage] = useState('')
+
+    // Load saved credentials on component mount
+    useEffect(() => {
+        const savedEmail = localStorage.getItem('remembered_email')
+        const savedPassword = localStorage.getItem('remembered_password')
+        
+        if (savedEmail && savedPassword) {
+            setEmail(savedEmail)
+            setPassword(savedPassword)
+            setRememberMe(true)
+        }
+    }, [])
 
     // Check for success message from navigation
     useEffect(() => {
@@ -49,6 +62,15 @@ export default function Login() {
 
         const result = await login(email, password, turnstileToken)
         if (result.success) {
+            // Handle remember me functionality
+            if (rememberMe) {
+                localStorage.setItem('remembered_email', email)
+                localStorage.setItem('remembered_password', password)
+            } else {
+                localStorage.removeItem('remembered_email')
+                localStorage.removeItem('remembered_password')
+            }
+            
             navigate('/dashboard', { replace: true })
         } else {
             // Reset turnstile token on error
@@ -164,6 +186,8 @@ export default function Login() {
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <input
                                     type="checkbox"
+                                    checked={rememberMe}
+                                    onChange={(e) => setRememberMe(e.target.checked)}
                                     className="w-4 h-4 rounded border-2 border-gray-300 text-[#8B5CF6] focus:ring-[#8B5CF6]"
                                 />
                                 <span className="text-sm text-gray-600">Remember me</span>
