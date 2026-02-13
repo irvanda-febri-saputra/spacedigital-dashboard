@@ -76,39 +76,27 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md">
-        {/* Register Card - Neo Brutalism */}
-        <div className="neo-card p-8">
-          {/* Logo */}
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center mb-4">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gray-900 rounded-xl translate-x-1 translate-y-1"></div>
-                <div className="relative w-14 h-14 bg-[#8B5CF6] rounded-xl border-2 border-gray-900 flex items-center justify-center">
-                  <span className="text-white font-black text-xl">S</span>
-                </div>
+        {/* Header Outside Card */}
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-gray-900">Create an Account</h1>
+          <div className="h-0.5 bg-[#8B5CF6] mx-auto mt-2 mb-4" style={{width: 'fit-content', minWidth: '150px'}}></div>
+          <p className="text-gray-600">Join Spacedigital to access card checking services</p>
+        </div>
+
+        {/* Register Card */}
+        <div className="bg-white p-8 border-4 border-black rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          {/* Info Box - Blue */}
+          <div className="mb-6 p-4 bg-blue-50 border-2 border-blue-500 rounded-lg shadow-[3px_3px_0_#3b82f6]">
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
+              <span className="font-semibold text-blue-700">You'll receive a verification email after registration</span>
             </div>
-            <h1 className="text-xl font-black text-gray-900 tracking-tight">SPACEDIGITAL</h1>
-          </div>
-
-          {/* Header */}
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Create an Account
-            </h2>
-            <p className="text-gray-500 mt-2">
-              Join Spacedigital to manage your bot
-            </p>
-          </div>
-
-          {/* Info Box */}
-          <div className="mb-6 flex items-start gap-3 p-4 bg-violet-50 border-2 border-violet-500 shadow-[4px_4px_0_#7C3AED] rounded-lg">
-            <svg className="w-5 h-5 mt-0.5 flex-shrink-0 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span className="font-medium text-violet-700">You'll receive a verification email after registration</span>
           </div>
 
           {/* Error Message */}
@@ -128,7 +116,7 @@ export default function Register() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name */}
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Full Name
               </label>
               <input
@@ -137,7 +125,7 @@ export default function Register() {
                 value={formData.name}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border-2 border-black rounded-lg focus:outline-none focus:border-[#8B5CF6] focus:shadow-[6px_6px_0px_0px_rgba(139,92,246,0.3)] text-gray-900 font-medium shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-200 ease-in-out"
-                placeholder="John Doe"
+                placeholder="Enter your full name"
                 required
               />
               {errors.name && (
@@ -147,7 +135,7 @@ export default function Register() {
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email
               </label>
               <input
@@ -156,7 +144,7 @@ export default function Register() {
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border-2 border-black rounded-lg focus:outline-none focus:border-[#8B5CF6] focus:shadow-[6px_6px_0px_0px_rgba(139,92,246,0.3)] text-gray-900 font-medium shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-200 ease-in-out"
-                placeholder="name@example.com"
+                placeholder="Enter your email"
                 required
               />
               {errors.email && (
@@ -166,7 +154,7 @@ export default function Register() {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Password
               </label>
               <div className="relative">
@@ -176,13 +164,13 @@ export default function Register() {
                   value={formData.password}
                   onChange={handleChange}
                   className="w-full px-4 py-3 pr-12 border-2 border-black rounded-lg focus:outline-none focus:border-[#8B5CF6] focus:shadow-[6px_6px_0px_0px_rgba(139,92,246,0.3)] text-gray-900 font-medium shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-200 ease-in-out"
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                 >
                   {showPassword ? <IconEyeOff className="w-5 h-5" /> : <IconEye className="w-5 h-5" />}
                 </button>
@@ -190,14 +178,11 @@ export default function Register() {
               {errors.password && (
                 <p className="mt-2 text-sm text-red-500">{errors.password}</p>
               )}
-              <p className="mt-1.5 text-xs text-gray-400">
-                Must be at least 8 characters with uppercase and lowercase letters
-              </p>
             </div>
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Confirm Password
               </label>
               <input
@@ -206,7 +191,7 @@ export default function Register() {
                 value={formData.password_confirmation}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border-2 border-black rounded-lg focus:outline-none focus:border-[#8B5CF6] focus:shadow-[6px_6px_0px_0px_rgba(139,92,246,0.3)] text-gray-900 font-medium shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-200 ease-in-out"
-                placeholder="••••••••"
+                placeholder="Confirm your password"
                 required
               />
               {errors.password_confirmation && (
@@ -214,51 +199,61 @@ export default function Register() {
               )}
             </div>
 
-            {/* Cloudflare Turnstile */}
+            {/* Turnstile Widget */}
             <div className="flex justify-center">
               <Turnstile
                 sitekey={TURNSTILE_SITE_KEY}
-                onVerify={(token) => setTurnstileToken(token)}
-                onExpire={() => setTurnstileToken('')}
+                onVerify={(token) => {
+                  setTurnstileToken(token)
+                  setTurnstileError('')
+                }}
+                onError={() => {
+                  setTurnstileError('Security verification failed. Please try again.')
+                  setTurnstileToken('')
+                }}
+                onExpire={() => {
+                  setTurnstileToken('')
+                }}
                 theme="light"
               />
             </div>
 
-            {/* Submit */}
+            {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading}
-              className="neo-btn-primary w-full mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading || !turnstileToken}
+              className="w-full bg-[#8B5CF6] text-white py-3 px-4 text-sm font-bold rounded-lg hover:bg-[#7C3AED] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#8B5CF6] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
             >
-              {isLoading ? 'Creating account...' : 'Sign up'}
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Creating account...
+                </span>
+              ) : (
+                'Sign up'
+              )}
             </button>
           </form>
 
           {/* Divider */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t-2 border-gray-200" />
-            </div>
-            <div className="relative flex justify-center">
-              <span className="px-4 bg-white text-gray-400 text-sm font-medium">
-                OR
-              </span>
-            </div>
+          <div className="mt-6 text-center">
+            <span className="text-sm text-gray-500">OR</span>
           </div>
 
           {/* Login Link */}
-          <p className="text-center text-gray-500">
+          <p className="mt-4 text-center text-sm text-gray-600">
             Already have an account?{' '}
-            <Link to="/login" className="font-semibold text-[#8B5CF6] hover:underline">
+            <Link
+              to="/login"
+              className="text-[#8B5CF6] hover:text-[#7C3AED] font-medium"
+            >
               Sign in
             </Link>
           </p>
         </div>
-
-        {/* Footer */}
-        <p className="mt-6 text-center text-sm text-gray-500">
-          © 2025 Spacedigital. All rights reserved.
-        </p>
       </div>
     </div>
   )
