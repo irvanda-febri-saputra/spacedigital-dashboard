@@ -57,10 +57,10 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center px-4 sm:px-6 lg:px-8">
             <div className="w-full max-w-sm">
-                {/* Login Card */}
-                <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200">
+                {/* Login Card - Neo Brutalism */}
+                <div className="neo-card p-8">
                     {/* Logo */}
                     <div className="text-center mb-8">
                         <h1 className="text-3xl font-black text-gray-900 tracking-tight">SPACEDIGITAL</h1>
@@ -96,17 +96,17 @@ export default function Login() {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Email */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Username or Telegram Username
+                            <label className="block text-sm font-black text-gray-900 uppercase tracking-wide mb-2">
+                                Username or Telegram
                             </label>
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#8B5CF6] text-gray-900"
+                                className="neo-input w-full px-4 py-3 border-4 border-black font-bold bg-white text-gray-900 focus:outline-none focus:ring-0 focus:shadow-[4px_4px_0_#8B5CF6]"
                                 placeholder=""
                                 required
                             />
@@ -114,7 +114,7 @@ export default function Login() {
 
                         {/* Password */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-black text-gray-900 uppercase tracking-wide mb-2">
                                 Password
                             </label>
                             <div className="relative">
@@ -122,14 +122,14 @@ export default function Login() {
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#8B5CF6] text-gray-900 pr-12"
+                                    className="neo-input w-full px-4 py-3 pr-12 border-4 border-black font-bold bg-white text-gray-900 focus:outline-none focus:ring-0 focus:shadow-[4px_4px_0_#8B5CF6]"
                                     placeholder=""
                                     required
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-900 hover:text-[#8B5CF6] font-bold transition-colors"
                                 >
                                     {showPassword ? (
                                         <IconEyeOff className="w-5 h-5" />
@@ -180,7 +180,7 @@ export default function Login() {
                         <button
                             type="submit"
                             disabled={isLoading || !turnstileToken}
-                            className="w-full bg-[#8B5CF6] text-white py-3 px-4 rounded-lg font-medium hover:bg-[#7C3AED] focus:outline-none focus:ring-2 focus:ring-[#8B5CF6] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+                            className="neo-btn w-full bg-[#8B5CF6] text-white py-4 px-6 border-4 border-black font-black text-lg uppercase tracking-wider hover:bg-[#7C3AED] focus:outline-none focus:ring-0 disabled:opacity-50 disabled:cursor-not-allowed mt-6 shadow-[4px_4px_0_#000] hover:shadow-[2px_2px_0_#000] active:shadow-none active:transform active:translate-x-[2px] active:translate-y-[2px] transition-all"
                         >
                             {isLoading ? (
                                 <span className="flex items-center justify-center gap-2">
