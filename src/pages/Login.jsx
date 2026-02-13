@@ -100,7 +100,7 @@ export default function Login() {
                         {/* Email */}
                         <div>
                             <label className="block text-sm font-black text-gray-900 uppercase tracking-wide mb-2">
-                                Username or Telegram
+                                Email
                             </label>
                             <input
                                 type="email"
