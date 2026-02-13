@@ -79,15 +79,15 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center px-4 sm:px-6 lg:px-8">
-            <div className="w-full max-w-sm">
-                {/* Login Card - Neo Brutalism */}
-                <div className="neo-card p-8">
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+            <div className="w-full max-w-md">
+                {/* Login Card */}
+                <div className="bg-white p-8 border border-gray-200 shadow-sm">
                     {/* Logo */}
                     <div className="text-center mb-8">
-                        <h1 className="text-3xl font-black text-gray-900 tracking-tight">SPACEDIGITAL</h1>
-                        <div className="w-20 h-1 bg-[#8B5CF6] mx-auto mt-2 mb-4"></div>
-                        <p className="text-gray-600 text-lg">Sign in to your account</p>
+                        <h1 className="text-2xl font-bold text-gray-900">SPACEDIGITAL</h1>
+                        <div className="w-16 h-0.5 bg-[#8B5CF6] mx-auto mt-2 mb-4"></div>
+                        <p className="text-gray-600">Sign in to your account</p>
                     </div>
 
                     {/* Success Message */}
@@ -118,17 +118,17 @@ export default function Login() {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-4">
                         {/* Email */}
                         <div>
-                            <label className="block text-sm font-black text-gray-900 uppercase tracking-wide mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Email
                             </label>
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="neo-input w-full px-4 py-3 border-2 border-black bg-white text-gray-900 focus:outline-none focus:ring-0 focus:shadow-[3px_3px_0_#8B5CF6]"
+                                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-[#8B5CF6] text-gray-900"
                                 placeholder=""
                                 required
                             />
@@ -136,7 +136,7 @@ export default function Login() {
 
                         {/* Password */}
                         <div>
-                            <label className="block text-sm font-black text-gray-900 uppercase tracking-wide mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Password
                             </label>
                             <div className="relative">
@@ -144,14 +144,14 @@ export default function Login() {
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="neo-input w-full px-4 py-3 pr-12 border-2 border-black bg-white text-gray-900 focus:outline-none focus:ring-0 focus:shadow-[3px_3px_0_#8B5CF6]"
+                                    className="w-full px-3 py-2 pr-10 border border-gray-300 focus:outline-none focus:border-[#8B5CF6] text-gray-900"
                                     placeholder=""
                                     required
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-900 hover:text-[#8B5CF6] font-bold transition-colors"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                                 >
                                     {showPassword ? (
                                         <IconEyeOff className="w-5 h-5" />
@@ -183,18 +183,18 @@ export default function Login() {
 
                         {/* Remember & Forgot */}
                         <div className="flex items-center justify-between">
-                            <label className="flex items-center gap-2 cursor-pointer">
+                            <label className="flex items-center">
                                 <input
                                     type="checkbox"
                                     checked={rememberMe}
                                     onChange={(e) => setRememberMe(e.target.checked)}
-                                    className="w-4 h-4 rounded border-2 border-gray-300 text-[#8B5CF6] focus:ring-[#8B5CF6]"
+                                    className="w-4 h-4 text-[#8B5CF6] bg-gray-100 border-gray-300 rounded focus:ring-[#8B5CF6] focus:ring-2"
                                 />
-                                <span className="text-sm text-gray-600">Remember me</span>
+                                <span className="ml-2 text-sm text-gray-600">Remember me</span>
                             </label>
                             <Link
                                 to="/forgot-password"
-                                className="text-sm text-[#8B5CF6] hover:underline"
+                                className="text-sm text-[#8B5CF6] hover:text-[#7C3AED]"
                             >
                                 Forgot password?
                             </Link>
@@ -204,11 +204,11 @@ export default function Login() {
                         <button
                             type="submit"
                             disabled={isLoading || !turnstileToken}
-                            className="neo-btn w-full bg-[#8B5CF6] text-white py-3 px-4 border-2 border-black font-black text-base uppercase tracking-wider hover:bg-[#7C3AED] focus:outline-none focus:ring-0 disabled:opacity-50 disabled:cursor-not-allowed mt-6 shadow-[3px_3px_0_#000] hover:shadow-[1px_1px_0_#000] active:shadow-none active:transform active:translate-x-[2px] active:translate-y-[2px] transition-all"
+                            className="w-full bg-[#8B5CF6] text-white py-2.5 px-4 text-sm font-medium hover:bg-[#7C3AED] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#8B5CF6] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
                             {isLoading ? (
                                 <span className="flex items-center justify-center gap-2">
-                                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                     </svg>
@@ -221,16 +221,16 @@ export default function Login() {
                     </form>
 
                     {/* Divider */}
-                    <div className="text-center text-gray-400 text-sm my-4">
-                        OR
+                    <div className="mt-6 text-center">
+                        <span className="text-sm text-gray-500">OR</span>
                     </div>
 
                     {/* Register Link */}
-                    <p className="text-center text-sm text-gray-600">
+                    <p className="mt-4 text-center text-sm text-gray-600">
                         Don't have an account?{' '}
                         <Link
                             to="/register"
-                            className="font-medium text-[#8B5CF6] hover:underline"
+                            className="text-[#8B5CF6] hover:text-[#7C3AED] font-medium"
                         >
                             Register
                         </Link>
