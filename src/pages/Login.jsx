@@ -84,12 +84,12 @@ export default function Login() {
                 {/* Header Outside Card */}
                 <div className="text-center mb-8">
                     <h1 className="text-2xl font-bold text-gray-900">SPACEDIGITAL</h1>
-                    <div className="w-16 h-0.5 bg-[#8B5CF6] mx-auto mt-2 mb-4"></div>
+                    <div className="h-0.5 bg-[#8B5CF6] mx-auto mt-2 mb-4" style={{width: 'fit-content', minWidth: '120px'}}></div>
                     <p className="text-gray-600">Sign in to your account</p>
                 </div>
 
                 {/* Login Card */}
-                <div className="bg-white p-8 border-4 border-black rounded-2xl shadow-lg">
+                <div className="bg-white p-8 border-4 border-black rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
                     {/* Success Message */}
                     {successMessage && (
                         <div className="mb-6 p-4 bg-green-50 border-2 border-green-500 rounded-lg shadow-[3px_3px_0_#22c55e]">
