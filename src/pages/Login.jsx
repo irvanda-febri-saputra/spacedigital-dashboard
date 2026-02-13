@@ -106,7 +106,7 @@ export default function Login() {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="neo-input w-full px-4 py-3 border-2 border-black font-bold bg-white text-gray-900 focus:outline-none focus:ring-0 focus:shadow-[3px_3px_0_#8B5CF6]"
+                                className="neo-input w-full px-4 py-3 border-2 border-black bg-white text-gray-900 focus:outline-none focus:ring-0 focus:shadow-[3px_3px_0_#8B5CF6]"
                                 placeholder=""
                                 required
                             />
@@ -122,7 +122,7 @@ export default function Login() {
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="neo-input w-full px-4 py-3 pr-12 border-2 border-black font-bold bg-white text-gray-900 focus:outline-none focus:ring-0 focus:shadow-[3px_3px_0_#8B5CF6]"
+                                    className="neo-input w-full px-4 py-3 pr-12 border-2 border-black bg-white text-gray-900 focus:outline-none focus:ring-0 focus:shadow-[3px_3px_0_#8B5CF6]"
                                     placeholder=""
                                     required
                                 />
