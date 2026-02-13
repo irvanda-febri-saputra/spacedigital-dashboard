@@ -817,58 +817,74 @@ export default function Stocks() {
       {/* Delete All Confirmation */}
       {deleteAllConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] w-full max-w-lg">
-            <div className="border-b-4 border-black p-4 bg-red-100">
+          <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] w-full max-w-lg rounded-lg overflow-hidden">
+            <div className="border-b-4 border-black p-6 bg-gradient-to-r from-red-100 to-pink-100">
               <div className="flex items-center gap-3">
-                <IconTrash className="w-8 h-8 text-red-600" />
-                <h3 className="text-xl font-black text-red-700 uppercase tracking-wide">Hapus Semua Stok?</h3>
+                <div className="p-3 bg-red-200 border-2 border-black rounded-lg">
+                  <IconTrash className="w-6 h-6 text-red-700" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-gray-800">Hapus Semua Stok?</h3>
+                  <p className="text-sm text-gray-600 font-medium">Tindakan ini tidak dapat dibatalkan</p>
+                </div>
               </div>
             </div>
             
             <div className="p-6">
-              <div className="bg-yellow-100 border-4 border-yellow-400 p-4 mb-6">
-                <p className="font-black text-yellow-800 uppercase tracking-wide mb-3 text-sm">
-                  ⚠️ PERINGATAN PENTING!
-                </p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="font-black text-yellow-700">PRODUK:</span>
-                    <span className="bg-white border-2 border-black px-2 py-1 font-bold">
-                      {products.find(p => p.id == selectedProduct)?.name}
-                    </span>
+              <div className="bg-gradient-to-br from-orange-50 to-yellow-50 border-2 border-orange-200 p-4 rounded-xl mb-6">
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-gradient-to-br from-blue-100 to-purple-100 border-2 border-black rounded-lg flex-shrink-0">
+                      <IconPackage className="w-4 h-4 text-purple-700" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-gray-700 text-sm mb-1">Produk yang akan dihapus:</p>
+                      <p className="bg-white border-2 border-gray-300 px-3 py-2 rounded-lg font-bold text-purple-700 text-sm">
+                        {products.find(p => p.id == selectedProduct)?.name}
+                      </p>
+                    </div>
                   </div>
+                  
                   {selectedVariant && (
-                    <div className="flex items-center gap-2">
-                      <span className="font-black text-yellow-700">VARIANT:</span>
-                      <span className="bg-purple-200 border-2 border-black px-2 py-1 font-bold">
-                        {variants.find(v => v.id == selectedVariant)?.name}
-                      </span>
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 bg-gradient-to-br from-purple-100 to-pink-100 border-2 border-black rounded-lg flex-shrink-0">
+                        <IconLink className="w-4 h-4 text-purple-700" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-bold text-gray-700 text-sm mb-1">Variant:</p>
+                        <p className="bg-purple-50 border-2 border-purple-200 px-3 py-2 rounded-lg font-bold text-purple-700 text-sm">
+                          {variants.find(v => v.id == selectedVariant)?.name}
+                        </p>
+                      </div>
                     </div>
                   )}
-                  <div className="flex items-center gap-2">
-                    <span className="font-black text-yellow-700">JUMLAH:</span>
-                    <span className="bg-red-200 border-2 border-black px-2 py-1 font-bold text-red-700">
-                      {stocks.length} STOK
-                    </span>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-gradient-to-br from-red-100 to-pink-100 border-2 border-black rounded-lg flex-shrink-0">
+                      <IconTrash className="w-4 h-4 text-red-700" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-gray-700 text-sm mb-1">Total stok yang akan terhapus:</p>
+                      <p className="bg-red-50 border-2 border-red-200 px-3 py-2 rounded-lg font-black text-red-600 text-lg">
+                        {stocks.length} item
+                      </p>
+                    </div>
                   </div>
                 </div>
-                <p className="text-xs font-black text-red-600 mt-3 uppercase tracking-wider">
-                  DATA TERHAPUS TIDAK DAPAT DIKEMBALIKAN!
-                </p>
               </div>
               
               <div className="flex gap-3">
                 <button
                   onClick={() => setDeleteAllConfirm(false)}
-                  className="neo-btn-secondary flex-1 font-black uppercase tracking-wide"
+                  className="neo-btn-secondary flex-1 py-3 font-bold rounded-lg transition-all hover:scale-105"
                 >
                   Batal
                 </button>
                 <button
                   onClick={handleDeleteAll}
-                  className="neo-btn-danger flex-1 font-black uppercase tracking-wide"
+                  className="neo-btn-danger flex-1 py-3 font-bold rounded-lg transition-all hover:scale-105"
                 >
-                  Ya, Hapus Semua!
+                  Ya, Hapus Semua
                 </button>
               </div>
             </div>
