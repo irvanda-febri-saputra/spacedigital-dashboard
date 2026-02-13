@@ -294,15 +294,27 @@ export default function Stocks() {
   }
 
   const handleDeleteAll = async () => {
+    // Validasi product harus dipilih
+    if (!selectedProduct) {
+      showToast('Silakan pilih produk terlebih dahulu', 'error')
+      return
+    }
+
     try {
-      await stockService.deleteAllStocks(selectedProduct, selectedVariant || null)
+      // Convert selectedProduct ke number jika string
+      const productId = parseInt(selectedProduct)
+      const variantId = selectedVariant ? parseInt(selectedVariant) : null
+      
+      await stockService.deleteAllStocks(productId, variantId)
       showToast('Semua stock berhasil dihapus', 'success')
       setDeleteAllConfirm(false)
       fetchStocksForProduct(selectedProduct, selectedVariant)
       fetchStats()
       fetchProducts()
     } catch (error) {
-      showToast('Gagal menghapus semua stock', 'error')
+      console.error('Delete All Error:', error)
+      const errorMsg = error.response?.data?.message || error.response?.data?.error || 'Gagal menghapus semua stock'
+      showToast(errorMsg, 'error')
     }
   }
 
@@ -486,7 +498,7 @@ export default function Stocks() {
               </button>
               <button
                 onClick={() => setDeleteAllConfirm(true)}
-                disabled={stocks.length === 0}
+                disabled={!selectedProduct || stocks.length === 0}
                 className="neo-btn-danger px-3 py-2 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <IconTrash className="w-4 h-4" />
