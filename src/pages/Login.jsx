@@ -106,7 +106,7 @@ export default function Login() {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="neo-input w-full px-4 py-3 border-4 border-black font-bold bg-white text-gray-900 focus:outline-none focus:ring-0 focus:shadow-[4px_4px_0_#8B5CF6]"
+                                className="neo-input w-full px-4 py-3 border-2 border-black font-bold bg-white text-gray-900 focus:outline-none focus:ring-0 focus:shadow-[3px_3px_0_#8B5CF6]"
                                 placeholder=""
                                 required
                             />
@@ -122,7 +122,7 @@ export default function Login() {
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="neo-input w-full px-4 py-3 pr-12 border-4 border-black font-bold bg-white text-gray-900 focus:outline-none focus:ring-0 focus:shadow-[4px_4px_0_#8B5CF6]"
+                                    className="neo-input w-full px-4 py-3 pr-12 border-2 border-black font-bold bg-white text-gray-900 focus:outline-none focus:ring-0 focus:shadow-[3px_3px_0_#8B5CF6]"
                                     placeholder=""
                                     required
                                 />
@@ -180,7 +180,7 @@ export default function Login() {
                         <button
                             type="submit"
                             disabled={isLoading || !turnstileToken}
-                            className="neo-btn w-full bg-[#8B5CF6] text-white py-4 px-6 border-4 border-black font-black text-lg uppercase tracking-wider hover:bg-[#7C3AED] focus:outline-none focus:ring-0 disabled:opacity-50 disabled:cursor-not-allowed mt-6 shadow-[4px_4px_0_#000] hover:shadow-[2px_2px_0_#000] active:shadow-none active:transform active:translate-x-[2px] active:translate-y-[2px] transition-all"
+                            className="neo-btn w-full bg-[#8B5CF6] text-white py-3 px-4 border-2 border-black font-black text-base uppercase tracking-wider hover:bg-[#7C3AED] focus:outline-none focus:ring-0 disabled:opacity-50 disabled:cursor-not-allowed mt-6 shadow-[3px_3px_0_#000] hover:shadow-[1px_1px_0_#000] active:shadow-none active:transform active:translate-x-[2px] active:translate-y-[2px] transition-all"
                         >
                             {isLoading ? (
                                 <span className="flex items-center justify-center gap-2">
