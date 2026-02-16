@@ -679,15 +679,24 @@ export default function BotProducts() {
                   />
                 </div>
                 <div>
-                  <label className="block font-bold mb-2">Nama Produk *</label>
+                  <label className="block font-bold mb-2">
+                    Nama Produk *
+                    {editingProduct && (
+                      <span className="text-xs font-normal text-red-600 ml-1">(Tidak dapat diubah)</span>
+                    )}
+                  </label>
                   <input
                     type="text"
                     value={productForm.name}
                     onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
                     required
-                    className="neo-input"
+                    disabled={!!editingProduct}
+                    className={`neo-input ${editingProduct ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''}`}
                     placeholder="Netflix Premium"
                   />
+                  {editingProduct && (
+                    <p className="text-xs text-gray-600 mt-1">💡 Hapus produk & buat ulang untuk ganti nama</p>
+                  )}
                 </div>
               </div>
 
