@@ -356,15 +356,28 @@ export default function Products() {
 
               {/* Name */}
               <div>
-                <label className="block font-bold mb-2">Nama Produk *</label>
+                <label className="block font-bold mb-2">
+                  Nama Produk *
+                  {editingProduct && (
+                    <span className="text-sm font-normal text-red-600 ml-2">
+                      (Tidak dapat diubah)
+                    </span>
+                  )}
+                </label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
+                  disabled={!!editingProduct}
                   placeholder="Nama produk"
-                  className="neo-input"
+                  className={`neo-input ${editingProduct ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 />
+                {editingProduct && (
+                  <p className="text-xs text-gray-600 mt-1">
+                    💡 Tip: Untuk mengubah nama, hapus produk dan buat ulang
+                  </p>
+                )}
               </div>
 
               {/* Description */}
