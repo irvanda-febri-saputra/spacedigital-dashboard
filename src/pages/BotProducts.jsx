@@ -668,23 +668,19 @@ export default function BotProducts() {
             <form onSubmit={handleProductSubmit} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold mb-2">Kode Barang *</label>
+                  <label className="block font-bold mb-2">Kode Produk *</label>
                   <input
                     type="text"
                     value={productForm.product_code}
                     onChange={(e) => setProductForm({ ...productForm, product_code: e.target.value.toUpperCase() })}
                     required
-                    className="neo-input"
+                    disabled={!!editingProduct}
+                    className={`neo-input ${editingProduct ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''}`}
                     placeholder="NETFLIX"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold mb-2">
-                    Nama Produk *
-                    {editingProduct && (
-                      <span className="text-xs font-normal text-red-600 ml-1">(Tidak dapat diubah)</span>
-                    )}
-                  </label>
+                  <label className="block font-bold mb-2">Nama Produk *</label>
                   <input
                     type="text"
                     value={productForm.name}
@@ -694,9 +690,6 @@ export default function BotProducts() {
                     className={`neo-input ${editingProduct ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''}`}
                     placeholder="Netflix Premium"
                   />
-                  {editingProduct && (
-                    <p className="text-xs text-gray-600 mt-1">💡 Hapus produk & buat ulang untuk ganti nama</p>
-                  )}
                 </div>
               </div>
 
