@@ -103,14 +103,7 @@ export default function Sidebar({ isOpen, onClose, collapsed, onCollapsedChange 
                 {/* Header */}
                 <div className="flex h-16 items-center border-b-2 border-gray-200 px-4">
                     {!collapsed && (
-                        <Link to="/dashboard" className="flex items-center gap-3" onClick={onClose}>
-                            {/* Logo Icon */}
-                            <div className="relative">
-                                <div className="absolute inset-0 bg-gray-900 rounded-xl translate-x-0.5 translate-y-0.5"></div>
-                                <div className="relative w-10 h-10 bg-[#8B5CF6] rounded-xl border-2 border-gray-900 flex items-center justify-center">
-                                    <span className="text-white font-black text-lg">S</span>
-                                </div>
-                            </div>
+                        <Link to="/dashboard" className="flex items-center" onClick={onClose}>
                             <span className="text-lg font-black text-gray-900 tracking-tight">
                                 SPACEDIGITAL
                             </span>
